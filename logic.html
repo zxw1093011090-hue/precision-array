@@ -1,0 +1,781 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>阵列优配 | 让位逻辑演示</title>
+    <style>
+:root {
+  --bg: #f5f5f7;
+  --panel: rgba(255, 255, 255, 0.9);
+  --ink: #1d1d1f;
+  --muted: #6e6e73;
+  --line: #d2d2d7;
+  --blue: #0071e3;
+  --green: #12805c;
+  --red: #ff3b30;
+  --shadow: 0 18px 60px rgba(0, 0, 0, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  background: linear-gradient(180deg, #fbfbfd 0%, var(--bg) 54%, #fff 100%);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Microsoft YaHei", "Segoe UI", sans-serif;
+}
+
+.shell {
+  width: min(1180px, calc(100% - 36px));
+  margin: 0 auto;
+  padding: 42px 0 56px;
+}
+
+.hero {
+  min-height: 260px;
+  display: flex;
+  align-items: center;
+}
+
+.brand-lockup {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 18px;
+  align-items: center;
+}
+
+.brand-heading {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+
+.brand-mark {
+  width: 112px;
+  height: 112px;
+  flex: 0 0 auto;
+  display: block;
+  overflow: visible;
+  filter: drop-shadow(0 18px 26px rgba(0, 113, 227, 0.16));
+}
+
+.logo-shell {
+  fill: url("#brandShell");
+  stroke: rgba(0, 113, 227, 0.22);
+  stroke-width: 1.2;
+}
+
+.logo-tile {
+  fill: rgba(0, 113, 227, 0.08);
+  stroke: rgba(0, 113, 227, 0.2);
+  stroke-width: 1.6;
+}
+
+.logo-route {
+  fill: none;
+  stroke: url("#brandRoute");
+  stroke-width: 14;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.logo-arrow {
+  fill: url("#brandRoute");
+}
+
+h1 {
+  margin: 0;
+  font-size: 68px;
+  line-height: 1.02;
+  letter-spacing: 0;
+}
+
+.brand-subtitle {
+  margin: 8px 0 0;
+  color: var(--blue);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.lead {
+  max-width: 690px;
+  margin: 18px 0 0;
+  color: var(--muted);
+  font-size: 19px;
+  line-height: 1.55;
+}
+
+.panel,
+.stage-card,
+.explain-card {
+  border: 1px solid rgba(210, 210, 215, 0.78);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px);
+}
+
+.panel {
+  padding: 22px;
+}
+
+.section-title {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: flex-start;
+  margin-bottom: 18px;
+}
+
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+h2 {
+  font-size: 24px;
+}
+
+.section-title p,
+.explain-card p {
+  margin-top: 9px;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.toolbar,
+.case-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.case-buttons {
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+
+button {
+  min-height: 42px;
+  padding: 0 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.92);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease, background-color 0.12s ease;
+}
+
+button:active {
+  transform: translateY(1px) scale(0.97);
+  filter: brightness(0.97);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.primary,
+.case-buttons button.active {
+  border-color: var(--blue);
+  color: #fff;
+  background: var(--blue);
+}
+
+.demo-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 18px;
+  align-items: stretch;
+}
+
+.stage-card {
+  padding: 12px;
+  overflow: hidden;
+}
+
+#stage {
+  display: block;
+  width: 100%;
+  min-height: 620px;
+}
+
+.block-face {
+  stroke: #6e6e73;
+  stroke-width: 2;
+}
+
+.hidden-edge {
+  stroke: rgba(29, 29, 31, 0.42);
+  stroke-width: 1.6;
+  stroke-dasharray: 7 6;
+  fill: none;
+}
+
+.solid-edge {
+  stroke: #6e6e73;
+  stroke-width: 2;
+  fill: none;
+}
+
+
+.a-face {
+  fill: rgba(0, 113, 227, 0.12);
+}
+
+.b-face {
+  fill: rgba(255, 149, 0, 0.16);
+}
+
+.top-face {
+  fill: rgba(255, 255, 255, 0.56);
+}
+
+.side-face {
+  fill: rgba(210, 210, 215, 0.34);
+}
+
+.contact-line {
+  stroke: #1d1d1f;
+  stroke-width: 3;
+}
+
+.ghost-line {
+  stroke: #a1a1a6;
+  stroke-width: 2;
+  stroke-dasharray: 6 6;
+}
+
+.interference {
+  fill: rgba(255, 59, 48, 0.2);
+  stroke: var(--red);
+  stroke-width: 2;
+  stroke-dasharray: 8 7;
+}
+
+.no-gap {
+  fill: rgba(18, 128, 92, 0.16);
+  stroke: var(--green);
+  stroke-width: 2;
+}
+
+.slice-panel {
+  fill: rgba(255, 255, 255, 0.78);
+  stroke: #d2d2d7;
+  stroke-width: 1.4;
+}
+
+.slice-axis {
+  stroke: #d2d2d7;
+  stroke-width: 1.4;
+  stroke-dasharray: 5 5;
+}
+
+.slice-a {
+  stroke: var(--blue);
+  stroke-width: 4;
+}
+
+.slice-b {
+  stroke: #ff9500;
+  stroke-width: 4;
+}
+
+.slice-gap {
+  stroke: var(--red);
+  stroke-width: 4;
+}
+
+.gap-arrow {
+  stroke: var(--blue);
+  stroke-width: 4;
+  marker-end: url(#arrowBlue);
+}
+
+.approach-arrow {
+  stroke: #86868b;
+  stroke-width: 3;
+  marker-end: url(#arrowGray);
+}
+
+text {
+  fill: var(--ink);
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.small {
+  fill: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.blue {
+  fill: var(--blue);
+}
+
+.red {
+  fill: var(--red);
+}
+
+.green {
+  fill: var(--green);
+}
+
+.explain-card {
+  padding: 20px;
+}
+
+.explain-card h3 {
+  font-size: 20px;
+}
+
+.formula-card {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+
+.formula-title {
+  color: var(--ink) !important;
+  font-weight: 800;
+}
+
+pre {
+  margin: 12px 0;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: auto;
+  background: #f5f5f7;
+}
+
+code {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.result-text {
+  font-weight: 800;
+}
+
+@media (max-width: 960px) {
+  h1 {
+    font-size: 46px;
+  }
+
+  .section-title,
+  .demo-grid {
+    grid-template-columns: 1fr;
+    display: grid;
+  }
+}
+
+</style>
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <div class="brand-lockup">
+          <div class="brand-heading">
+            <svg class="brand-mark" viewBox="0 0 112 112" aria-hidden="true">
+              <defs>
+                <linearGradient id="brandShell" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stop-color="#ffffff" />
+                  <stop offset="1" stop-color="#ebf5ff" />
+                </linearGradient>
+                <linearGradient id="brandRoute" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stop-color="#1e7bff" />
+                  <stop offset="1" stop-color="#005ed6" />
+                </linearGradient>
+              </defs>
+              <rect class="logo-shell" x="1" y="1" width="110" height="110" rx="22" />
+              <rect class="logo-tile" x="18" y="18" width="34" height="34" rx="9" />
+              <rect class="logo-tile" x="60" y="18" width="34" height="34" rx="9" />
+              <rect class="logo-tile" x="18" y="60" width="34" height="34" rx="9" />
+              <rect class="logo-tile" x="60" y="60" width="34" height="34" rx="9" />
+              <path class="logo-route" d="M39 35 H75 L37 77 H70" />
+              <path class="logo-arrow" d="M70 66 L85 77 L70 88 Z" />
+            </svg>
+            <h1>阵列优配</h1>
+          </div>
+          <div>
+            <p class="brand-subtitle">Precision Array</p>
+            <p class="lead">让位逻辑演示：用动画解释相邻两个工件的接触面同时倾斜时，何时需要让位，以及让位量如何取值。</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="section-title">
+          <div>
+            <h2>AB 两个接触面同时倾斜</h2>
+            <p>以 L 方向为例：A 在左侧固定，B 在右侧靠近。算法分别比较前边和后边的倾斜读数，取需要避让的最大值。</p>
+          </div>
+          <div class="toolbar">
+            <button id="play" class="primary">播放当前案例</button>
+            <button id="next">下一个案例</button>
+          </div>
+        </div>
+
+        <div class="demo-grid">
+          <div class="stage-card">
+            <svg id="stage" viewBox="0 0 920 620" role="img" aria-label="让位逻辑多案例动画"></svg>
+          </div>
+
+          <aside class="explain-card">
+            <h3 id="caseTitle">案例</h3>
+            <p id="caseSummary"></p>
+            <div class="case-buttons" id="caseButtons"></div>
+            <div class="formula-card">
+              <p class="formula-title">当前代码简化公式</p>
+              <pre><code id="formulaText"></code></pre>
+              <p id="resultText" class="result-text"></p>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </main>
+
+    <script>
+const svg = document.querySelector("#stage");
+const playButton = document.querySelector("#play");
+const nextButton = document.querySelector("#next");
+const caseTitle = document.querySelector("#caseTitle");
+const caseSummary = document.querySelector("#caseSummary");
+const caseButtons = document.querySelector("#caseButtons");
+const formulaText = document.querySelector("#formulaText");
+const resultText = document.querySelector("#resultText");
+
+const scale = 4;
+const baseX = 390;
+const frontY = 155;
+const backY = 315;
+const depthShift = 72;
+const partWidth = 210;
+const partHeight = 180;
+
+const cases = [
+  {
+    title: "前后都需要让位",
+    summary: "A 的右面在前后两边都比 B 的左面更向外凸，B 必须整体向右让开。",
+    aFront: 0.09,
+    aBack: 0.05,
+    bFront: 0.01,
+    bBack: -0.01
+  },
+  {
+    title: "前边需要让位",
+    summary: "只有前边发生干涉，后边本来可以贴合。最终让位取前边的最大干涉量。",
+    aFront: 0.08,
+    aBack: -0.01,
+    bFront: 0.00,
+    bBack: 0.03
+  },
+  {
+    title: "后边需要让位",
+    summary: "前边不干涉，但后边 A 比 B 更向外凸，所以 B 仍然要整体让开。",
+    aFront: -0.02,
+    aBack: 0.07,
+    bFront: 0.02,
+    bBack: 0.00
+  },
+  {
+    title: "都有倾斜但无需让位",
+    summary: "A 和 B 都倾斜，但 B 的接触面没有被 A 顶住，计算结果为 0。",
+    aFront: 0.00,
+    aBack: -0.02,
+    bFront: 0.04,
+    bBack: 0.03
+  },
+  {
+    title: "倾斜相互抵消",
+    summary: "两个面倾斜方向接近，前后差值都不大，算法认为可以直接贴合。",
+    aFront: 0.03,
+    aBack: -0.03,
+    bFront: 0.03,
+    bBack: -0.02
+  },
+  {
+    title: "B 比 A 更外凸",
+    summary: "B 的左面比 A 的右面更外凸，这不会要求 B 再向右让位，结果仍为 0。",
+    aFront: -0.02,
+    aBack: -0.03,
+    bFront: 0.05,
+    bBack: 0.04
+  }
+];
+
+let activeIndex = 0;
+let raf = 0;
+
+function gapOf(item) {
+  return Math.max(0, item.aFront - item.bFront, item.aBack - item.bBack);
+}
+
+function closestOffsetOf(item) {
+  return Math.max(item.aFront - item.bFront, item.aBack - item.bBack) * scale * 100;
+}
+
+function xAFront(item) {
+  return baseX + item.aFront * scale * 100;
+}
+
+function xABack(item) {
+  return baseX + item.aBack * scale * 100;
+}
+
+function xBFront(item, extra = 0) {
+  return baseX + item.bFront * scale * 100 + extra;
+}
+
+function xBBack(item, extra = 0) {
+  return baseX + item.bBack * scale * 100 + extra;
+}
+
+function points(list) {
+  return list.map((point) => point.join(",")).join(" ");
+}
+
+function cuboidGuideEdges({ leftFront, rightFront, leftBack, rightBack }) {
+  const topLeftFront = [leftFront[0] + depthShift, leftFront[1] - 52];
+  const topRightFront = [rightFront[0] + depthShift, rightFront[1] - 52];
+  const topLeftBack = [leftBack[0] + depthShift, leftBack[1] - 52];
+  const topRightBack = [rightBack[0] + depthShift, rightBack[1] - 52];
+  const edge = (a, b) => `<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" class="solid-edge"></line>`;
+  return [
+    edge(leftBack, topLeftBack),
+    edge(rightBack, topRightBack),
+    edge(topLeftBack, topRightBack),
+    edge(topLeftFront, topLeftBack),
+    edge(topRightFront, topRightBack)
+  ].join("");
+}
+
+function slicePanel(title, x, y, aValue, bValue, bOffset, diff, showFinal) {
+  const h = 116;
+  const bottomY = y + h;
+  const topY = y + 30;
+  const contactX = x + 122;
+  const localScale = 520;
+  const aTop = contactX + aValue * localScale;
+  const bBottom = contactX + bOffset;
+  const bTop = bBottom + bValue * localScale;
+  const gap = Math.max(0, diff) * localScale;
+  const stateClass = diff > 0 ? "red" : "green";
+  const stateText = diff > 0 ? `此边干涉 ${diff.toFixed(3)}` : "此边可贴合";
+
+  return `
+    <g>
+      <rect x="${x}" y="${y}" width="350" height="154" rx="8" class="slice-panel"></rect>
+      <text x="${x + 14}" y="${y + 24}" class="small">${title}</text>
+      <line x1="${contactX}" y1="${topY}" x2="${contactX}" y2="${bottomY}" class="slice-axis"></line>
+      <line x1="${contactX}" y1="${bottomY}" x2="${aTop}" y2="${topY}" class="slice-a"></line>
+      <line x1="${bBottom}" y1="${bottomY}" x2="${bTop}" y2="${topY}" class="slice-b"></line>
+      ${showFinal && diff > 0 ? `<line x1="${bTop}" y1="${topY - 10}" x2="${bTop + gap}" y2="${topY - 10}" class="slice-gap"></line>` : ""}
+      <text x="${x + 14}" y="${y + 136}" class="small">蓝=A接触边，橙=B接触边</text>
+      <text x="${x + 188}" y="${y + 24}" class="${stateClass}">${stateText}</text>
+    </g>
+  `;
+}
+
+function draw(progress = 1) {
+  const item = cases[activeIndex];
+  const gap = gapOf(item);
+  const gapPx = gap * scale * 100;
+  const closestOffset = closestOffsetOf(item);
+  const startOffset = 260;
+  const contactOffset = gap > 0 ? 0 : closestOffset;
+  const finalOffset = closestOffset;
+  let bOffset;
+  let showInterference = false;
+  let showFinal = false;
+
+  if (progress < 0.48) {
+    bOffset = startOffset + (contactOffset - startOffset) * (progress / 0.48);
+  } else if (progress < 0.68) {
+    bOffset = contactOffset;
+    showInterference = gap > 0;
+  } else {
+    const t = (progress - 0.68) / 0.32;
+    bOffset = contactOffset + (finalOffset - contactOffset) * t;
+    showInterference = gap > 0;
+    showFinal = true;
+  }
+
+  const af = xAFront(item);
+  const ab = xABack(item);
+  const bf = xBFront(item, bOffset);
+  const bb = xBBack(item, bOffset);
+  const bfTouch = xBFront(item, 0);
+  const bbTouch = xBBack(item, 0);
+  const frontGap = item.aFront - item.bFront;
+  const backGap = item.aBack - item.bBack;
+  const needsGap = gap > 0;
+
+  const aBody = [
+    [af - partWidth, frontY],
+    [af, frontY],
+    [ab, backY],
+    [ab - partWidth, backY]
+  ];
+  const aTop = [
+    [af - partWidth, frontY],
+    [af, frontY],
+    [af + depthShift, frontY - 52],
+    [af - partWidth + depthShift, frontY - 52]
+  ];
+  const aSide = [
+    [af, frontY],
+    [af + depthShift, frontY - 52],
+    [ab + depthShift, backY - 52],
+    [ab, backY]
+  ];
+  const aHidden = cuboidGuideEdges({
+    leftFront: [af - partWidth, frontY],
+    rightFront: [af, frontY],
+    leftBack: [ab - partWidth, backY],
+    rightBack: [ab, backY]
+  });
+
+  const bBody = [
+    [bf, frontY],
+    [bf + partWidth, frontY],
+    [bb + partWidth, backY],
+    [bb, backY]
+  ];
+  const bTop = [
+    [bf, frontY],
+    [bf + partWidth, frontY],
+    [bf + partWidth + depthShift, frontY - 52],
+    [bf + depthShift, frontY - 52]
+  ];
+  const bSide = [
+    [bf, frontY],
+    [bf + depthShift, frontY - 52],
+    [bb + depthShift, backY - 52],
+    [bb, backY]
+  ];
+  const bHidden = cuboidGuideEdges({
+    leftFront: [bf, frontY],
+    rightFront: [bf + partWidth, frontY],
+    leftBack: [bb, backY],
+    rightBack: [bb + partWidth, backY]
+  });
+
+  const interferenceFront = Math.max(0, frontGap) * scale * 100;
+  const interferenceBack = Math.max(0, backGap) * scale * 100;
+  const interference = [
+    [bfTouch, frontY],
+    [bfTouch + interferenceFront, frontY],
+    [bbTouch + interferenceBack, backY],
+    [bbTouch, backY]
+  ];
+
+  svg.innerHTML = `
+    <defs>
+      <marker id="arrowBlue" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto">
+        <path d="M0,0 L8,3 L0,6 Z" fill="#0071e3"></path>
+      </marker>
+      <marker id="arrowGray" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto">
+        <path d="M0,0 L8,3 L0,6 Z" fill="#86868b"></path>
+      </marker>
+    </defs>
+    <line x1="70" y1="372" x2="850" y2="372" class="ghost-line"></line>
+
+    <polygon points="${points(aTop)}" class="block-face top-face"></polygon>
+    <polygon points="${points(aBody)}" class="block-face a-face"></polygon>
+    <polygon points="${points(aSide)}" class="block-face side-face"></polygon>
+    ${aHidden}
+    <line x1="${af}" y1="${frontY}" x2="${ab}" y2="${backY}" class="contact-line"></line>
+
+    <polygon points="${points(bTop)}" class="block-face top-face"></polygon>
+    <polygon points="${points(bBody)}" class="block-face b-face"></polygon>
+    <polygon points="${points(bSide)}" class="block-face side-face"></polygon>
+    ${bHidden}
+    <line x1="${bf}" y1="${frontY}" x2="${bb}" y2="${backY}" class="contact-line"></line>
+
+    ${showInterference ? `<polygon points="${points(interference)}" class="interference"></polygon>` : ""}
+    ${showFinal && needsGap ? `<line x1="${baseX}" y1="92" x2="${baseX + gapPx}" y2="92" class="gap-arrow"></line>
+      <text x="${baseX + gapPx + 14}" y="98" class="blue">让位 ${gap.toFixed(3)}</text>` : ""}
+    ${showFinal && !needsGap ? `<rect x="${baseX - 16}" y="82" width="150" height="34" rx="8" class="no-gap"></rect>
+      <text x="${baseX}" y="105" class="green">无需让位</text>` : ""}
+
+    <line x1="760" y1="210" x2="650" y2="210" class="approach-arrow"></line>
+    <text x="662" y="196" class="small">B 向 A 靠近</text>
+
+    <text x="${af - 150}" y="407">工件 A</text>
+    <text x="${bf + 70}" y="407">工件 B</text>
+    <text x="${af + 10}" y="${frontY - 16}" class="small">A右面前边 ${item.aFront.toFixed(3)}</text>
+    <text x="${ab + 12}" y="${backY + 22}" class="small">A右面后边 ${item.aBack.toFixed(3)}</text>
+    <text x="${bf - 150}" y="${frontY + 20}" class="small">B左面前边 ${item.bFront.toFixed(3)}</text>
+    <text x="${bb - 150}" y="${backY + 42}" class="small">B左面后边 ${item.bBack.toFixed(3)}</text>
+
+    <text x="74" y="52">前边差值：${frontGap.toFixed(3)}</text>
+    <text x="74" y="82">后边差值：${backGap.toFixed(3)}</text>
+    <text x="74" y="112" class="${needsGap ? "red" : "green"}">最终让位：${gap.toFixed(3)}</text>
+    ${slicePanel("前边截面：A右前 vs B左前", 70, 430, item.aFront, item.bFront, bOffset, frontGap, showFinal)}
+    ${slicePanel("后边截面：A右后 vs B左后", 500, 430, item.aBack, item.bBack, bOffset, backGap, showFinal)}
+  `;
+}
+
+function renderText() {
+  const item = cases[activeIndex];
+  const gap = gapOf(item);
+  const frontGap = item.aFront - item.bFront;
+  const backGap = item.aBack - item.bBack;
+  caseTitle.textContent = item.title;
+  caseSummary.textContent = item.summary;
+  formulaText.textContent = `让位 = max(
+  0,
+  A右面前边 - B左面前边 = ${frontGap.toFixed(3)},
+  A右面后边 - B左面后边 = ${backGap.toFixed(3)}
+)`;
+  resultText.textContent = gap > 0
+    ? `结果：需要让位 ${gap.toFixed(3)}。`
+    : "结果：不需要让位，按当前公式可直接贴合。";
+  resultText.style.color = gap > 0 ? "var(--red)" : "var(--green)";
+  [...caseButtons.children].forEach((button, index) => {
+    button.classList.toggle("active", index === activeIndex);
+  });
+}
+
+function animate() {
+  cancelAnimationFrame(raf);
+  const started = performance.now();
+  const duration = 4200;
+  function frame(now) {
+    const progress = Math.min(1, (now - started) / duration);
+    draw(progress);
+    if (progress < 1) raf = requestAnimationFrame(frame);
+  }
+  raf = requestAnimationFrame(frame);
+}
+
+function selectCase(index, shouldPlay = true) {
+  activeIndex = index;
+  renderText();
+  draw(shouldPlay ? 0 : 1);
+  if (shouldPlay) animate();
+}
+
+cases.forEach((item, index) => {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.textContent = `${index + 1}. ${item.title}`;
+  button.addEventListener("click", () => selectCase(index));
+  caseButtons.appendChild(button);
+});
+
+playButton.addEventListener("click", () => animate());
+nextButton.addEventListener("click", () => selectCase((activeIndex + 1) % cases.length));
+
+selectCase(0, false);
+window.setTimeout(animate, 500);
+
+</script>
+  </body>
+</html>

@@ -1,0 +1,2987 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>阵列优配 | Zavier</title>
+    <style>
+:root {
+  --bg: #f5f5f7;
+  --panel: rgba(255, 255, 255, 0.86);
+  --ink: #1d1d1f;
+  --muted: #6e6e73;
+  --line: #d2d2d7;
+  --blue: #0071e3;
+  --green: #12805c;
+  --shadow: 0 18px 60px rgba(0, 0, 0, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  background: linear-gradient(180deg, #fbfbfd 0%, var(--bg) 48%, #ffffff 100%);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Microsoft YaHei", "Segoe UI", sans-serif;
+}
+
+.shell {
+  width: min(1180px, calc(100% - 36px));
+  margin: 0 auto;
+  padding: 42px 0 56px;
+  display: flex;
+  flex-direction: column;
+}
+
+.hero {
+  min-height: 260px;
+  display: flex;
+  align-items: center;
+}
+
+.brand-lockup {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 18px;
+  align-items: center;
+}
+
+.brand-heading {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+
+.brand-mark {
+  width: 112px;
+  height: 112px;
+  flex: 0 0 auto;
+  display: block;
+  overflow: visible;
+  filter: drop-shadow(0 18px 26px rgba(0, 113, 227, 0.16));
+}
+
+.logo-shell {
+  fill: url("#brandShell");
+  stroke: rgba(0, 113, 227, 0.22);
+  stroke-width: 1.2;
+}
+
+.logo-tile {
+  fill: rgba(0, 113, 227, 0.08);
+  stroke: rgba(0, 113, 227, 0.2);
+  stroke-width: 1.6;
+}
+
+.logo-route {
+  fill: none;
+  stroke: url("#brandRoute");
+  stroke-width: 14;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.logo-arrow {
+  fill: url("#brandRoute");
+}
+
+h1 {
+  margin: 0;
+  font-size: 68px;
+  line-height: 1.02;
+  letter-spacing: 0;
+}
+
+.brand-subtitle {
+  margin: 8px 0 0;
+  color: var(--blue);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.lead {
+  max-width: 690px;
+  margin: 18px 0 0;
+  color: var(--muted);
+  font-size: 19px;
+  line-height: 1.55;
+}
+
+.status-pill {
+  flex: 0 0 auto;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--green);
+  background: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.combination-status {
+  margin: 2px 0 16px;
+  padding: 12px 14px;
+  border: 1px solid rgba(18, 128, 92, 0.24);
+  border-radius: 8px;
+  color: var(--green);
+  background: rgba(240, 253, 244, 0.72);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.panel,
+.solution {
+  margin-top: 18px;
+  padding: 22px;
+  border: 1px solid rgba(210, 210, 215, 0.75);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px);
+}
+
+.guide-panel {
+  order: 1;
+}
+
+.logic-panel {
+  order: 2;
+}
+
+.data-panel {
+  order: 3;
+}
+
+.results {
+  order: 4;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+h2,
+h3 {
+  margin: 0;
+  letter-spacing: 0;
+}
+
+h2 {
+  font-size: 23px;
+}
+
+h3 {
+  font-size: 14px;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.grid {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.four {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+label {
+  display: grid;
+  gap: 7px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+input,
+select,
+button,
+.button-link {
+  min-height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.92);
+  font: inherit;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 0 12px;
+}
+
+input[type="number"] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
+}
+
+input.validation-error,
+select.validation-error {
+  border-color: #ff453a;
+  background: #fff7f6;
+  box-shadow: 0 0 0 4px rgba(255, 69, 58, 0.12);
+  outline: none;
+}
+
+button,
+.button-link {
+  position: relative;
+  padding: 0 14px;
+  cursor: pointer;
+  font-weight: 700;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease, background-color 0.12s ease;
+}
+
+button:hover,
+.button-link:hover {
+  border-color: #a1a1a6;
+}
+
+button:active:not(:disabled),
+button.press-feedback:not(:disabled),
+.button-link:active,
+.button-link.press-feedback {
+  transform: translateY(1px) scale(0.97);
+  filter: brightness(0.97);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.button-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.primary {
+  border-color: var(--blue);
+  color: #fff;
+  background: var(--blue);
+}
+
+.stop-button {
+  border-color: #ff3b30;
+  color: #ff3b30;
+}
+
+.stop-button:disabled {
+  border-color: var(--line);
+  color: #a1a1a6;
+  cursor: not-allowed;
+}
+
+.icon-button {
+  width: 42px;
+  padding: 0;
+  font-size: 18px;
+}
+
+.toolbar {
+  display: flex;
+  gap: 10px;
+}
+
+.logic-link-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.logic-link-content p {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.mini-table {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 7px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.72);
+  overflow: visible;
+  min-width: 0;
+}
+
+.tolerance-grid .mini-table {
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.68fr) minmax(0, 0.72fr);
+}
+
+.product-tolerance-grid .mini-table {
+  grid-template-columns: repeat(2, minmax(78px, 0.36fr));
+  justify-content: start;
+}
+
+.mini-table input {
+  min-width: 0;
+  width: 100%;
+  padding: 0 7px;
+  font-size: 14px;
+}
+
+.mini-table h3 {
+  grid-column: 1 / -1;
+}
+
+.mini-table p {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.mini-table p b {
+  color: var(--ink);
+}
+
+.hint {
+  margin: -6px 0 18px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.weights {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.weights[hidden] {
+  display: none !important;
+}
+
+.weights label {
+  grid-template-columns: 70px 1fr 24px;
+  align-items: center;
+  color: var(--ink);
+}
+
+input[type="range"] {
+  padding: 0;
+  accent-color: var(--blue);
+}
+
+.table-wrap {
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+th,
+td {
+  min-width: 112px;
+  padding: 9px;
+  border-bottom: 1px solid #ececf0;
+  text-align: center;
+  font-size: 13px;
+}
+
+th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #f8f8fa;
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.field-code,
+.field-name {
+  display: block;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.field-code {
+  color: var(--ink);
+  font-size: 13px;
+}
+
+.field-name {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+td:first-child,
+th:first-child {
+  min-width: 112px;
+}
+
+td input {
+  min-width: 96px;
+  min-height: 34px;
+  padding: 0 8px;
+  border-color: transparent;
+  background: #f7f7f9;
+  text-align: center;
+}
+
+.results {
+  display: grid;
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.progress-panel {
+  padding: 18px;
+  border: 1px solid rgba(210, 210, 215, 0.75);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.progress-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 12px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.progress-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+.progress-track {
+  width: 100%;
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e8e8ed;
+}
+
+.progress-fill {
+  width: 0%;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--blue);
+  transition: width 0.04s linear;
+}
+
+.solution h2 {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.solution h2 span {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 18px 0;
+}
+
+.tolerance-report {
+  margin-top: 18px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.tolerance-report.warn {
+  border-color: rgba(255, 69, 58, 0.36);
+  background: #fff7f6;
+}
+
+.tolerance-report.ok {
+  border-color: rgba(18, 128, 92, 0.28);
+  background: rgba(240, 253, 244, 0.7);
+}
+
+.tolerance-report b {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.tolerance-report p {
+  margin: 0 0 10px;
+  color: var(--muted);
+}
+
+.tolerance-table-wrap {
+  overflow: auto;
+}
+
+.tolerance-table th,
+.tolerance-table td {
+  min-width: 100px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.metric {
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.metric b {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 15px;
+}
+
+.metric p {
+  margin: 4px 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.layout-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.position-card {
+  padding: 12px;
+  border: 1px solid #e5e5ea;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.position-card b {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.position-card p {
+  margin: 3px 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.spatial-layout {
+  display: grid;
+  gap: 14px;
+}
+
+.spatial-note {
+  padding: 12px 14px;
+  border: 1px solid #d2d2d7;
+  border-radius: 8px;
+  background: #f7f7f9;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.6;
+}
+
+.spatial-layer {
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+}
+
+.spatial-layer-title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.spatial-layer-title b {
+  font-size: 15px;
+}
+
+.spatial-layer-title span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.spatial-grid {
+  display: grid;
+  gap: 6px;
+  overflow-x: auto;
+}
+
+.spatial-corner,
+.spatial-axis,
+.spatial-row-label {
+  min-height: 30px;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.spatial-cell {
+  min-height: 72px;
+  padding: 8px;
+  display: grid;
+  align-content: center;
+  gap: 5px;
+  border: 1px solid #d2d2d7;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #ffffff 0%, #f6f8fb 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.spatial-cell b {
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+.spatial-cell span {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.model-results {
+  display: grid;
+  gap: 14px;
+}
+
+.model-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 12px;
+}
+
+.model-card {
+  display: grid;
+  grid-template-columns: 190px minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.035);
+}
+
+.mini-model-3d {
+  width: 100%;
+  height: auto;
+  display: block;
+  border: 1px solid #e5e5ea;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #fbfbfd 0%, #f3f4f8 100%);
+}
+
+.model-axis line {
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+
+.model-axis .axis-back {
+  opacity: 0.16;
+  filter: blur(0.2px);
+}
+
+.model-axis .axis-front {
+  opacity: 1;
+}
+
+.axis-l {
+  stroke: #007aff;
+}
+
+.axis-w {
+  stroke: #34c759;
+}
+
+.axis-h {
+  stroke: #af52de;
+}
+
+.axis-label {
+  font-size: 11px;
+  font-weight: 900;
+  paint-order: stroke;
+  stroke: #fff;
+  stroke-width: 3px;
+}
+
+.axis-position-summary {
+  fill: #1d1d1f;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0;
+  paint-order: stroke;
+  stroke: #fff;
+  stroke-width: 3px;
+}
+
+.axis-l-label {
+  fill: #007aff;
+}
+
+.axis-w-label {
+  fill: #248a3d;
+}
+
+.axis-h-label {
+  fill: #af52de;
+}
+
+.model-layer-section {
+  display: grid;
+  gap: 10px;
+}
+
+.model-layer-section h3 {
+  margin: 4px 0 0;
+  padding: 9px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #f7f7f9;
+  color: var(--ink);
+  font-size: 15px;
+}
+
+.model-layer-section h3 span {
+  margin-left: 8px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.model-card-info {
+  min-width: 0;
+}
+
+.model-card-info b {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 17px;
+}
+
+.model-position {
+  display: inline-block;
+  margin-bottom: 8px;
+  color: #ff453a;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.model-card-info p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.empty {
+  padding: 24px;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.guide-current {
+  padding: 9px 13px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--blue);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.guide-layout {
+  display: grid;
+  grid-template-columns: 190px minmax(320px, 1fr) minmax(250px, 0.8fr) 210px;
+  gap: 20px;
+  align-items: stretch;
+}
+
+.guide-picker {
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.guide-picker h3 {
+  margin-bottom: 12px;
+  color: var(--ink);
+  font-size: 15px;
+}
+
+.guide-buttons {
+  display: grid;
+  gap: 8px;
+}
+
+.guide-button {
+  min-height: 34px;
+  padding: 0 10px;
+  border-radius: 8px;
+  text-align: left;
+  color: var(--ink);
+  background: #f7f7f9;
+  font-size: 13px;
+}
+
+.guide-button.active {
+  border-color: var(--blue);
+  color: var(--blue);
+  background: #eef6ff;
+}
+
+.cuboid-stage {
+  min-height: 360px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+#measureSvg {
+  width: 100%;
+  height: 100%;
+  min-height: 360px;
+}
+
+.cartoon-cuboid {
+  filter: url(#cartoonBlockShadow);
+}
+
+.face {
+  fill: rgba(255, 255, 255, 0.08);
+  stroke: #8ebae8;
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.top-face {
+  fill: rgba(255, 255, 255, 0.12);
+}
+
+.left-face {
+  fill: rgba(122, 184, 255, 0.1);
+}
+
+.front-face {
+  fill: rgba(255, 255, 255, 0.06);
+}
+
+.right-face {
+  fill: rgba(122, 184, 255, 0.08);
+}
+
+.edge {
+  fill: none;
+  stroke: #6aa6e8;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.hidden-edge {
+  stroke-dasharray: 8 7;
+  opacity: 0.55;
+}
+
+.measure-line {
+  stroke: #ff3b30;
+  stroke-width: 8;
+  stroke-linecap: round;
+  filter: drop-shadow(0 2px 5px rgba(255, 59, 48, 0.28));
+}
+
+.measure-face {
+  fill: rgba(255, 59, 48, 0.2);
+  stroke: #ff3b30;
+  stroke-width: 2.5;
+}
+
+.measure-arrow {
+  stroke: var(--blue);
+  stroke-width: 3;
+  stroke-linecap: round;
+  marker-end: url(#arrow);
+}
+
+.probe-assembly {
+  animation: probe-move 1.8s ease-in-out infinite;
+}
+
+.probe-stem {
+  stroke: #5f6f89;
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+
+.probe-contact {
+  fill: #ff453a;
+  stroke: #fff;
+  stroke-width: 2;
+}
+
+.probe-shadow {
+  fill: rgba(29, 29, 31, 0.12);
+}
+
+.probe-cartoon-body {
+  fill: #7ab8ff;
+  stroke: #2578d5;
+  stroke-width: 2;
+}
+
+.probe-cartoon-body-back,
+.probe-dial-back {
+  fill: #4b89d5;
+  stroke: #2578d5;
+  stroke-width: 1.6;
+  opacity: 0.78;
+}
+
+.probe-back-post {
+  stroke: #4f91df;
+  stroke-width: 5;
+  stroke-linecap: round;
+  opacity: 0.72;
+}
+
+.probe-neck {
+  fill: #5aa0f2;
+  stroke: #2578d5;
+  stroke-width: 1.5;
+}
+
+.probe-dial {
+  fill: #ffffff;
+  stroke: #2578d5;
+  stroke-width: 2.5;
+}
+
+.probe-dial-face {
+  fill: #eef7ff;
+  stroke: #b7d7ff;
+  stroke-width: 1.2;
+}
+
+.probe-scale {
+  fill: none;
+  stroke: #2578d5;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+}
+
+.probe-hub,
+.probe-button {
+  fill: #2578d5;
+}
+
+.probe-needle {
+  stroke: #ff453a;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.probe-direction-label {
+  fill: #1d1d1f;
+  font-size: 12px;
+  font-weight: 800;
+  paint-order: stroke;
+  stroke: #fff;
+  stroke-width: 3px;
+}
+
+.face-label {
+  fill: var(--muted);
+  font-size: 14px;
+  font-weight: 800;
+  text-anchor: middle;
+  pointer-events: none;
+}
+
+.ghost-label {
+  fill: #9a9aa1;
+}
+
+.guide-copy {
+  padding: 4px 0;
+}
+
+.guide-copy h3 {
+  margin: 0 0 12px;
+  color: var(--ink);
+  font-size: 28px;
+}
+
+.guide-copy p {
+  margin: 0 0 14px;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.guide-rule {
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+@keyframes probe-move {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-92px); }
+}
+
+@media (max-width: 820px) {
+  h1 {
+    font-size: 42px;
+  }
+
+  .hero,
+  .section-title {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .three,
+  .four,
+  .weights,
+  .metrics,
+  .guide-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .toolbar {
+    width: 100%;
+  }
+
+  .toolbar button,
+  .toolbar .button-link {
+    flex: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button,
+  .button-link {
+    transition: none;
+  }
+
+  button:active:not(:disabled),
+  button.press-feedback:not(:disabled),
+  .button-link:active,
+  .button-link.press-feedback {
+    transform: none;
+  }
+}
+
+</style>
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <div class="brand-lockup">
+          <div class="brand-heading">
+            <svg class="brand-mark" viewBox="0 0 112 112" aria-hidden="true">
+              <defs>
+                <linearGradient id="brandShell" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stop-color="#ffffff" />
+                  <stop offset="1" stop-color="#ebf5ff" />
+                </linearGradient>
+                <linearGradient id="brandRoute" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stop-color="#1e7bff" />
+                  <stop offset="1" stop-color="#005ed6" />
+                </linearGradient>
+              </defs>
+              <rect class="logo-shell" x="1" y="1" width="110" height="110" rx="22" />
+              <rect class="logo-tile" x="18" y="18" width="34" height="34" rx="9" />
+              <rect class="logo-tile" x="60" y="18" width="34" height="34" rx="9" />
+              <rect class="logo-tile" x="18" y="60" width="34" height="34" rx="9" />
+              <rect class="logo-tile" x="60" y="60" width="34" height="34" rx="9" />
+              <path class="logo-route" d="M39 35 H75 L37 77 H70" />
+              <path class="logo-arrow" d="M70 66 L85 77 L70 88 Z" />
+            </svg>
+            <h1>阵列优配</h1>
+          </div>
+          <div>
+            <p class="brand-subtitle">Precision Array</p>
+            <p class="lead">
+              面向长方体工件的公差排列优化工具。根据每块工件的实测尺寸、侧面倾斜和成品公差，推荐 L/W/H 阵列中的放置位置、翻转朝向，并提示整体尺寸风险。
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="section-title">
+          <h2>组合与目标</h2>
+        </div>
+
+        <div class="grid three">
+          <label>
+            <span>L 数量</span>
+            <input id="countL" type="number" min="1" max="8" />
+          </label>
+          <label>
+            <span>W 数量</span>
+            <input id="countW" type="number" min="1" max="8" />
+          </label>
+          <label>
+            <span>H 数量</span>
+            <input id="countH" type="number" min="1" max="8" />
+          </label>
+        </div>
+
+        <div class="grid three tolerance-grid">
+          <div class="mini-table">
+            <h3>单件 L 尺寸</h3>
+            <input id="nomL" type="number" step="0.001" aria-label="单件L名义尺寸" placeholder="单件名义尺寸" />
+            <input id="upperL" type="number" step="0.001" aria-label="单件L上偏差" placeholder="单件上偏差" />
+            <input id="lowerL" type="number" step="0.001" aria-label="单件L下偏差" placeholder="单件下偏差" />
+          </div>
+          <div class="mini-table">
+            <h3>单件 W 尺寸</h3>
+            <input id="nomW" type="number" step="0.001" aria-label="单件W名义尺寸" placeholder="单件名义尺寸" />
+            <input id="upperW" type="number" step="0.001" aria-label="单件W上偏差" placeholder="单件上偏差" />
+            <input id="lowerW" type="number" step="0.001" aria-label="单件W下偏差" placeholder="单件下偏差" />
+          </div>
+          <div class="mini-table">
+            <h3>单件 H 尺寸</h3>
+            <input id="nomH" type="number" step="0.001" aria-label="单件H名义尺寸" placeholder="单件名义尺寸" />
+            <input id="upperH" type="number" step="0.001" aria-label="单件H上偏差" placeholder="单件上偏差" />
+            <input id="lowerH" type="number" step="0.001" aria-label="单件H下偏差" placeholder="单件下偏差" />
+          </div>
+        </div>
+        <p class="hint">这里填写的是单个工件的名义尺寸和单个工件公差，不是最终组合后的总尺寸。每组依次为：单件名义尺寸、单件上偏差、单件下偏差。</p>
+
+        <div class="grid three product-tolerance-grid">
+          <div class="mini-table">
+            <h3>成品 L 公差</h3>
+            <input id="prodUpperL" type="number" step="0.001" aria-label="成品L上偏差" placeholder="成品上偏差" />
+            <input id="prodLowerL" type="number" step="0.001" aria-label="成品L下偏差" placeholder="成品下偏差" />
+            <p>名义 <b id="finalNomL">-</b><br />范围 <b id="finalRangeL">-</b></p>
+          </div>
+          <div class="mini-table">
+            <h3>成品 W 公差</h3>
+            <input id="prodUpperW" type="number" step="0.001" aria-label="成品W上偏差" placeholder="成品上偏差" />
+            <input id="prodLowerW" type="number" step="0.001" aria-label="成品W下偏差" placeholder="成品下偏差" />
+            <p>名义 <b id="finalNomW">-</b><br />范围 <b id="finalRangeW">-</b></p>
+          </div>
+          <div class="mini-table">
+            <h3>成品 H 公差</h3>
+            <input id="prodUpperH" type="number" step="0.001" aria-label="成品H上偏差" placeholder="成品上偏差" />
+            <input id="prodLowerH" type="number" step="0.001" aria-label="成品H下偏差" placeholder="成品下偏差" />
+            <p>名义 <b id="finalNomH">-</b><br />范围 <b id="finalRangeH">-</b></p>
+          </div>
+        </div>
+        <p class="hint">成品名义尺寸由系统自动计算：单件名义尺寸 × 对应方向数量。优化目标固定为：在成品公差范围内尽量小，并优先保证重点方向平整。</p>
+
+        <div class="combination-status" id="dataStatus">等待输入</div>
+
+        <div class="grid three focus-compute-grid">
+          <label>
+            <span>重点方向</span>
+            <select id="focusDir">
+              <option value="">请选择</option>
+              <option value="H">H 平面度</option>
+              <option value="L">L 平整度</option>
+              <option value="W">W 平整度</option>
+            </select>
+          </label>
+          <label>
+            <span>计算方式</span>
+            <select id="computeMode">
+              <option value="" selected disabled>请选择计算方式</option>
+              <option value="time">按预计时间</option>
+              <option value="count">按计算次数</option>
+              <option value="exact">完整枚举</option>
+            </select>
+          </label>
+          <label>
+            <span>预计时间</span>
+            <select id="timeBudget">
+              <option value="2000">2 秒</option>
+              <option value="5000">5 秒</option>
+              <option value="10000">10 秒</option>
+              <option value="15000">15 秒</option>
+              <option value="30000">30 秒</option>
+              <option value="60000" selected>60 秒</option>
+              <option value="120000">2 分钟</option>
+              <option value="300000">5 分钟</option>
+            </select>
+          </label>
+          <label>
+            <span>计算次数</span>
+            <select id="countBudget">
+              <option value="60000">60,000 次</option>
+              <option value="300000">300,000 次</option>
+              <option value="1000000">1,000,000 次</option>
+              <option value="3000000">3,000,000 次</option>
+              <option value="6000000" selected>6,000,000 次</option>
+            </select>
+          </label>
+        </div>
+
+        <select id="targetL" hidden><option value="range-min" selected>在成品公差范围内尽量小</option></select>
+        <select id="targetW" hidden><option value="range-min" selected>在成品公差范围内尽量小</option></select>
+        <select id="targetH" hidden><option value="range-min" selected>在成品公差范围内尽量小</option></select>
+
+        <div class="weights">
+          <label><span>L 权重</span><input id="weightL" type="range" min="1" max="10" value="1" /><b id="weightLText">1</b></label>
+          <label><span>W 权重</span><input id="weightW" type="range" min="1" max="10" value="1" /><b id="weightWText">1</b></label>
+          <label><span>H 权重</span><input id="weightH" type="range" min="1" max="10" value="1" /><b id="weightHText">1</b></label>
+        </div>
+
+        </section>
+
+      <section class="panel guide-panel">
+        <div class="section-title">
+          <h2>测量指导</h2>
+          <div class="guide-current" id="guideCurrent">H-LF</div>
+        </div>
+
+        <div class="guide-layout">
+          <div class="guide-picker">
+            <h3>尺寸测量</h3>
+            <div class="guide-buttons" id="dimensionGuideButtons"></div>
+          </div>
+          <div class="cuboid-stage">
+            <svg id="measureSvg" viewBox="0 0 520 360" role="img" aria-label="长方体测量示意图">
+              <defs>
+                <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+                  <path d="M0,0 L8,4 L0,8 Z" fill="#0071e3"></path>
+                </marker>
+                <filter id="cartoonBlockShadow" x="-20%" y="-20%" width="140%" height="150%">
+                  <feDropShadow dx="0" dy="10" stdDeviation="8" flood-color="#1d1d1f" flood-opacity="0.12"></feDropShadow>
+                </filter>
+                <linearGradient id="cartoonTop" x1="0" x2="1" y1="0" y2="1">
+                  <stop offset="0%" stop-color="#ffffff"></stop>
+                  <stop offset="100%" stop-color="#dff1ff"></stop>
+                </linearGradient>
+                <linearGradient id="cartoonLeft" x1="0" x2="1" y1="0" y2="1">
+                  <stop offset="0%" stop-color="#f1f8ff"></stop>
+                  <stop offset="100%" stop-color="#b9ddff"></stop>
+                </linearGradient>
+                <linearGradient id="cartoonFront" x1="0" x2="1" y1="0" y2="1">
+                  <stop offset="0%" stop-color="#ffffff"></stop>
+                  <stop offset="100%" stop-color="#d7e8ff"></stop>
+                </linearGradient>
+                <linearGradient id="cartoonRight" x1="0" x2="1" y1="0" y2="1">
+                  <stop offset="0%" stop-color="#e8f4ff"></stop>
+                  <stop offset="100%" stop-color="#aacdf5"></stop>
+                </linearGradient>
+              </defs>
+              <g class="cartoon-cuboid">
+                <polygon points="110,110 330,110 410,160 190,160" class="face top-face"></polygon>
+                <polygon points="110,110 190,160 190,300 110,250" class="face left-face"></polygon>
+                <polygon points="190,160 410,160 410,300 190,300" class="face front-face"></polygon>
+                <polygon points="330,110 410,160 410,300 330,250" class="face right-face"></polygon>
+              </g>
+              <polyline points="110,110 330,110 410,160 410,300 190,300 110,250 110,110 190,160 410,160" class="edge"></polyline>
+              <line x1="330" y1="110" x2="330" y2="250" class="edge hidden-edge"></line>
+              <line x1="110" y1="250" x2="330" y2="250" class="edge hidden-edge"></line>
+              <line x1="330" y1="250" x2="410" y2="300" class="edge hidden-edge"></line>
+              <g id="measureLayer"></g>
+              <text x="148" y="214" class="face-label">2面 左面</text>
+              <text x="370" y="214" class="face-label">4面 右面</text>
+              <text x="300" y="238" class="face-label">3面 前面</text>
+              <text x="260" y="136" class="face-label">6面 上面</text>
+              <text x="220" y="186" class="face-label ghost-label">5面 后面</text>
+              <text x="264" y="282" class="face-label ghost-label">1面 下面</text>
+            </svg>
+          </div>
+          <div class="guide-copy">
+            <p class="eyebrow" id="guideCode">H-LF</p>
+            <h3 id="guideTitle">左前角高度</h3>
+            <p id="guideDescription"></p>
+            <div class="guide-rule" id="guideRule"></div>
+          </div>
+          <div class="guide-picker">
+            <h3>侧面读数变化</h3>
+            <div class="guide-buttons" id="sideGuideButtons"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel logic-panel">
+        <div class="logic-link-content">
+          <div>
+            <h2>计算逻辑</h2>
+            <p>查看相邻工件接触面倾斜时的让位判断动画。</p>
+          </div>
+          <a class="button-link primary" href="logic.html">打开让位逻辑演示</a>
+        </div>
+      </section>
+
+      <section class="panel data-panel">
+        <div class="section-title">
+          <h2>工件实测数据</h2>
+          <div class="toolbar">
+            <input id="importFile" type="file" accept=".xlsx" hidden />
+            <a class="button-link" href="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,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R5UrwdfOxwe2dZlR1dzkJhpngmJ2R0TdC3FW32+Sye3sg7Op7+NCvQflQwuRccNXCG/kXAUcrn9QSwMEFAAAAAgA96y8XIet0lHfUwAA5BUEABgAAAB4bC93b3Jrc2hlZXRzL3NoZWV0MS54bWyc3c2uLsl5JeZbKdScZP2wiixBVMM6kRGRmZF/kRnuMU2WRKJJlkCyJV5CAzbgmQEDHthADw142IBh+GrcdvsujDwsSt75PacQqtnhU2vn2dK7uEkscH/51//mT7/9zUf/+PXv//Drb373s48//eEnH3/09e9+8c0vf/27v//Zx//+j3/3g59+/G/+5q//9Ff/9M3v/90ffvX113/86E+//c3v/vBXf/rZx7/64x//4a9+9KM//OJXX//253/44Tf/8PXv/vTb3/zdN7//7c//+IcffvP7v//RH/7h91///Jfvv+y3v/nRZ5988uWPfvvzX//u4/uB7/W//vXX//SHN//qoz/86pt/Sr//9S/Lr3/39R9+9vGnH390/9X/zTff/Lv7H4+//NnHn3z80Y/+5q9/xEfE93/7/vuPfvn13/383//mj/Wbf8pf//rvf/XHn3386Rfvv+5Pf/WLb37z/gt+8c1vPvrtr+//qz/+6Lc//9Of/65f//KPv/rZx59++sMvPv7oV7/+5S+//t37v/AX//4Pf/zmt//223/6Lw/68wM++/YBn/3LAz754Wf/mid8/u0TPv/eT/jxt0/48fd+whffPuGL7/2EL799wpff+wk/+fYJP/neT/jpt0/46fd+wlffPuGr7/2ETz/5S6M++f7P+OdWfvr9n/GXYt5/+L7P+Es17z9832f8pZz3H/7yjM//Vf8Wu//d++dHfPG9H/GXet5/+J6P+Es/7z98z0f8paD3H77nI/7S0PsP3+8Rn/2lofcfvucj/lLQ+w//ikf86F9+Ar//kR1+/sef3//i99/800e/fx+6f1p/9sX9pD9/+T//BH//Hxy/uFP/1acff3T/p8MnH3/0x599/Ic//v79P/rHv/l//o//4T//9//p/jv+8c9/0z9/xd9++xVfPL4i/6BE5d99MF+ZDx9+/t8qP3z4+czHb/M/eeTLD2JQPn0435TPH8z/LZ8/fjjP50/f5r965P/tDwqfP384z+eXD+Yrn798OM/nr3/O32V/kz9/8NkP4g+yvmT7ji/5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midzNM/mxbyaN3My7+bDnM2nuZgvczW3jhHF00XzPlQUXjTJwTyYR/NkjubZvJhX82ZO5t18mLP5NBfzZa7m1jGieLpo3oeKwosmOZgH82iezNE8mxfzat7MybybD3M2n+ZivszV3DpGFE8XzftQUXjRJAfzYB7NkzmaZ/NiXs2bOZl382HO5tNczJe5mlvHr6P469NF8z5EFOQ35mAezKN5MkfzbF7Mq3kzJ/NuPszZfJqL+TJXc+sYUTxdNO9DReFFkxzMg3k0T+Zons2LeTVv5mTezYc5m09zMV/mam4dI4qni+Z9qCi8aJKDeTCP5skczbN5Ma/mzZzMu/kwZ/NpLubLXM2tY0TxdNG8DxWFF01yMA/m0TyZo3k2L+bVvJmTeTcf5mw+zcV8mau5dYwoni6a96Gi8KJJDubBPJonczTP5sW8mjdzMu/mw5zNp7mYL3M1t44RxdNF8z5UFF40ycE8mEfzZI7m2byYV/NmTubdfJiz+TQX82Wu5tYxoni6aN6HisKLJjmYB/NonszRPJsX82rezMm8mw9zNp/mYr7M1dw6RhRPF837UFF40SQH82AezZM5mmfzYl7NmzmZd/NhzubTXMyXuZpbx4ji6aJ5HyoKL5rkYB7Mo3kyR/NsXsyreTMn824+zNl8mov5Mldz6xhRPF0070NF4UWTHMyDeTRP5miezYt5NW/mZN7NhzmbT3MxX+Zqbh2/iuLrLx8umi+Hr6MwvzEH82AezZM5mmfzYl7NmzmZd/NhzubTXMyXuZpbx4ji4aL5cqgouGiag3kwj+bJHM2zeTGv5s2czLv5MGfzaS7my1zNreN/RfHFP7/9+NO7d5/C209v7+Pf3/79XXr74e8///bxs1/e/fjpu8+//MNfPv/sw//H8fL86f3vL09ff/7Z9+8/fXr/67/efnr39m/vPtxvX33+2Y/v33/698vLd3x6+/0v7/LbD58+fvbD+3/89u/W/u2fffj2579993n5659//OPX33z1tx+++ub7P31/f/c/f/3lt4/ffvju858+ffr92y+++PjDT+9+ffvxD+9/f/fbP3/95cf3H359++njH95/+PsX73/88ecf3oX3P/zj13e/ffrij19++ecvPrz75e2nn9//9vGnn3//+K+f/5/PeXn93/cf/ufln/jv/wNQSwMEFAAAAAgA96y8XCiNFCt5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" download="工件实测数据通用导入模板.xlsx">下载模板</a>
+            <button id="importExcel">导入 Excel</button>
+            <button id="fillDemo" type="button">生成示例数据</button>
+            <button id="syncRows">刷新数量</button>
+            <button id="calculate" class="primary">计算</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table id="partTable">
+            <thead>
+              <tr>
+                <th><span class="field-code">编号</span><span class="field-name">工件编号</span></th>
+                <th><span class="field-code">H-LF</span><span class="field-name">高度-左前</span></th>
+                <th><span class="field-code">H-RF</span><span class="field-name">高度-右前</span></th>
+                <th><span class="field-code">H-LB</span><span class="field-name">高度-左后</span></th>
+                <th><span class="field-code">H-RB</span><span class="field-name">高度-右后</span></th>
+                <th><span class="field-code">L-FD</span><span class="field-name">长度-前下</span></th>
+                <th><span class="field-code">L-FU</span><span class="field-name">长度-前上</span></th>
+                <th><span class="field-code">L-BD</span><span class="field-name">长度-后下</span></th>
+                <th><span class="field-code">L-BU</span><span class="field-name">长度-后上</span></th>
+                <th><span class="field-code">W-LD</span><span class="field-name">宽度-左下</span></th>
+                <th><span class="field-code">W-LU</span><span class="field-name">宽度-左上</span></th>
+                <th><span class="field-code">W-RD</span><span class="field-name">宽度-右下</span></th>
+                <th><span class="field-code">W-RU</span><span class="field-name">宽度-右上</span></th>
+                <th><span class="field-code">S-2-F-H</span><span class="field-name">2面-前边</span></th>
+                <th><span class="field-code">S-2-B-H</span><span class="field-name">2面-后边</span></th>
+                <th><span class="field-code">S-4-F-H</span><span class="field-name">4面-前边</span></th>
+                <th><span class="field-code">S-4-B-H</span><span class="field-name">4面-后边</span></th>
+                <th><span class="field-code">S-3-L-H</span><span class="field-name">3面-左边</span></th>
+                <th><span class="field-code">S-3-R-H</span><span class="field-name">3面-右边</span></th>
+                <th><span class="field-code">S-5-L-H</span><span class="field-name">5面-左边</span></th>
+                <th><span class="field-code">S-5-R-H</span><span class="field-name">5面-右边</span></th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="results" class="results"></section>
+    </main>
+
+    <script>
+const sideFields = ["S-2-F-H", "S-2-B-H", "S-4-F-H", "S-4-B-H", "S-3-L-H", "S-3-R-H", "S-5-L-H", "S-5-R-H"];
+const fields = ["H-LF", "H-RF", "H-LB", "H-RB", "L-FD", "L-FU", "L-BD", "L-BU", "W-LD", "W-LU", "W-RD", "W-RU", ...sideFields];
+const dimensionFields = fields.slice(0, 12);
+const corners = ["LF", "RF", "LB", "RB"];
+const lKeys = ["FD", "FU", "BD", "BU"];
+const wKeys = ["LD", "LU", "RD", "RU"];
+const orientations = ["direct", "rotate", "flip", "flipRotate"];
+const exactLimit = 3000000;
+const deepChunkSize = 500;
+const progressUpdateMs = 33;
+let activeProgress = null;
+let stopRequested = false;
+let isComputing = false;
+
+const orientationText = {
+  direct: "按测量方向直接放：1面朝下，6面朝上，2面朝左，4面朝右，3面朝前，5面朝后。",
+  rotate: "水平旋转180度后放：1面朝下，6面朝上，4面朝左，2面朝右，5面朝前，3面朝后。",
+  flip: "上下翻转180度后放：6面朝下，1面朝上，2面朝左，4面朝右，3面朝前，5面朝后。",
+  flipRotate: "上下翻转180度，再水平旋转180度后放：6面朝下，1面朝上，4面朝左，2面朝右，5面朝前，3面朝后。"
+};
+
+const orientationShortText = {
+  direct: "按测量方向直接放",
+  rotate: "水平旋转180度后放",
+  flip: "上下翻转180度后放",
+  flipRotate: "上下翻转180度，再水平旋转180度后放"
+};
+
+const measureGuides = {
+  "H-LF": {
+    title: "左前角高度",
+    description: "测量左前竖向位置，从下表面 1 面到上表面 6 面的高度。",
+    rule: "红色线段表示需要测量的竖向位置。这里不要求测到数学顶点，只要固定在左前角附近的测量位置即可。",
+    line: [[190, 160], [190, 300]]
+  },
+  "H-RF": {
+    title: "右前角高度",
+    description: "测量右前竖向位置，从下表面 1 面到上表面 6 面的高度。",
+    rule: "红色线段表示右前竖向测量位置。",
+    line: [[410, 160], [410, 300]]
+  },
+  "H-LB": {
+    title: "左后角高度",
+    description: "测量左后竖向位置，从下表面 1 面到上表面 6 面的高度。",
+    rule: "红色线段表示左后竖向测量位置。",
+    line: [[110, 110], [110, 250]]
+  },
+  "H-RB": {
+    title: "右后角高度",
+    description: "测量右后竖向位置，从下表面 1 面到上表面 6 面的高度。",
+    rule: "红色线段表示右后竖向测量位置。",
+    line: [[330, 110], [330, 250]]
+  },
+  "L-FD": {
+    title: "前下位置长度",
+    description: "测量前侧下方沿 L 方向的长度，也就是前下边从左到右的长度。",
+    rule: "红色线段表示前下边。L 方向在现场定义为操作者面前的左右方向。",
+    line: [[190, 300], [410, 300]]
+  },
+  "L-FU": {
+    title: "前上位置长度",
+    description: "测量前侧上方沿 L 方向的长度，也就是前上边从左到右的长度。",
+    rule: "红色线段表示前上边。",
+    line: [[190, 160], [410, 160]]
+  },
+  "L-BD": {
+    title: "后下位置长度",
+    description: "测量后侧下方沿 L 方向的长度。",
+    rule: "红色线段表示后下边。",
+    line: [[110, 250], [330, 250]]
+  },
+  "L-BU": {
+    title: "后上位置长度",
+    description: "测量后侧上方沿 L 方向的长度。",
+    rule: "红色线段表示后上边。",
+    line: [[110, 110], [330, 110]]
+  },
+  "W-LD": {
+    title: "左下位置宽度",
+    description: "测量左侧下方沿 W 方向的宽度，也就是左下边从前到后的宽度。",
+    rule: "红色线段表示左下边。W 方向在现场定义为前后方向。",
+    line: [[110, 250], [190, 300]]
+  },
+  "W-LU": {
+    title: "左上位置宽度",
+    description: "测量左侧上方沿 W 方向的宽度。",
+    rule: "红色线段表示左上边。",
+    line: [[110, 110], [190, 160]]
+  },
+  "W-RD": {
+    title: "右下位置宽度",
+    description: "测量右侧下方沿 W 方向的宽度。",
+    rule: "红色线段表示右下边。",
+    line: [[330, 250], [410, 300]]
+  },
+  "W-RU": {
+    title: "右上位置宽度",
+    description: "测量右侧上方沿 W 方向的宽度。",
+    rule: "红色线段表示右上边。",
+    line: [[330, 110], [410, 160]]
+  },
+  "S-2-F-H": {
+    title: "2面前侧边线读数变化",
+    description: "千分表顶住 2 面靠近前侧的竖向边线位置，从下往上移动，记录终点读数减起点读数。",
+    rule: "统一规定：输入值 = 上端读数 - 下端读数；读数增加填正数，读数减少填负数。系统会按测量面自动换算真实倾斜方向。",
+    face: "2",
+    probe: { x: 176, y1: 276, y2: 190 }
+  },
+  "S-2-B-H": {
+    title: "2面后侧边线读数变化",
+    description: "千分表顶住 2 面靠近后侧的竖向边线位置，从下往上移动，记录读数变化。",
+    rule: "统一规定：输入值 = 上端读数 - 下端读数；读数增加填正数，读数减少填负数。系统会按测量面自动换算真实倾斜方向。",
+    face: "2",
+    probe: { x: 124, y1: 236, y2: 146 }
+  },
+  "S-4-F-H": {
+    title: "4面前侧边线读数变化",
+    description: "千分表顶住 4 面靠近前侧的竖向边线位置，从下往上移动，记录读数变化。",
+    rule: "统一规定：输入值 = 上端读数 - 下端读数；读数增加填正数，读数减少填负数。系统会按测量面自动换算真实倾斜方向。",
+    face: "4",
+    probe: { x: 396, y1: 276, y2: 190 }
+  },
+  "S-4-B-H": {
+    title: "4面后侧边线读数变化",
+    description: "千分表顶住 4 面靠近后侧的竖向边线位置，从下往上移动，记录读数变化。",
+    rule: "统一规定：输入值 = 上端读数 - 下端读数；读数增加填正数，读数减少填负数。系统会按测量面自动换算真实倾斜方向。",
+    face: "4",
+    probe: { x: 344, y1: 236, y2: 146 }
+  },
+  "S-3-L-H": {
+    title: "3面左侧边线读数变化",
+    description: "千分表顶住 3 面靠近左侧的竖向边线位置，从下往上移动，记录读数变化。",
+    rule: "统一规定：输入值 = 上端读数 - 下端读数；读数增加填正数，读数减少填负数。系统会按测量面自动换算真实倾斜方向。",
+    face: "3",
+    probe: { x: 206, y1: 286, y2: 194 }
+  },
+  "S-3-R-H": {
+    title: "3面右侧边线读数变化",
+    description: "千分表顶住 3 面靠近右侧的竖向边线位置，从下往上移动，记录读数变化。",
+    rule: "统一规定：输入值 = 上端读数 - 下端读数；读数增加填正数，读数减少填负数。系统会按测量面自动换算真实倾斜方向。",
+    face: "3",
+    probe: { x: 394, y1: 286, y2: 194 }
+  },
+  "S-5-L-H": {
+    title: "5面左侧边线读数变化",
+    description: "千分表顶住 5 面靠近左侧的竖向边线位置，从下往上移动，记录读数变化。",
+    rule: "统一规定：输入值 = 上端读数 - 下端读数；读数增加填正数，读数减少填负数。系统会按测量面自动换算真实倾斜方向。",
+    face: "5",
+    probe: { x: 124, y1: 236, y2: 146 }
+  },
+  "S-5-R-H": {
+    title: "5面右侧边线读数变化",
+    description: "千分表顶住 5 面靠近右侧的竖向边线位置，从下往上移动，记录读数变化。",
+    rule: "统一规定：输入值 = 上端读数 - 下端读数；读数增加填正数，读数减少填负数。系统会按测量面自动换算真实倾斜方向。",
+    face: "5",
+    probe: { x: 316, y1: 236, y2: 146 }
+  }
+};
+const dimensionGuideKeys = ["H-LF", "H-RF", "H-LB", "H-RB", "L-FD", "L-FU", "L-BD", "L-BU", "W-LD", "W-LU", "W-RD", "W-RU"];
+const sideGuideKeys = ["S-2-F-H", "S-2-B-H", "S-4-F-H", "S-4-B-H", "S-3-L-H", "S-3-R-H", "S-5-L-H", "S-5-R-H"];
+const guideButtonLabels = {
+  "H-LF": "H-LF 高度-左前",
+  "H-RF": "H-RF 高度-右前",
+  "H-LB": "H-LB 高度-左后",
+  "H-RB": "H-RB 高度-右后",
+  "L-FD": "L-FD 长度-前下",
+  "L-FU": "L-FU 长度-前上",
+  "L-BD": "L-BD 长度-后下",
+  "L-BU": "L-BU 长度-后上",
+  "W-LD": "W-LD 宽度-左下",
+  "W-LU": "W-LU 宽度-左上",
+  "W-RD": "W-RD 宽度-右下",
+  "W-RU": "W-RU 宽度-右上",
+  "S-2-F-H": "S-2-F-H 2面-前边",
+  "S-2-B-H": "S-2-B-H 2面-后边",
+  "S-4-F-H": "S-4-F-H 4面-前边",
+  "S-4-B-H": "S-4-B-H 4面-后边",
+  "S-3-L-H": "S-3-L-H 3面-左边",
+  "S-3-R-H": "S-3-R-H 3面-右边",
+  "S-5-L-H": "S-5-L-H 5面-左边",
+  "S-5-R-H": "S-5-R-H 5面-右边"
+};
+let selectedMeasureField = "H-LF";
+
+const $ = (id) => document.getElementById(id);
+const tbody = $("partTable").querySelector("tbody");
+
+function num(id) {
+  return Number($(id).value || 0);
+}
+
+function counts() {
+  return {
+    L: num("countL"),
+    W: num("countW"),
+    H: num("countH")
+  };
+}
+
+function hasValidCounts(c = counts()) {
+  return Number.isInteger(c.L) && Number.isInteger(c.W) && Number.isInteger(c.H) && c.L > 0 && c.W > 0 && c.H > 0;
+}
+
+function totalParts(c) {
+  return c.L * c.W * c.H;
+}
+
+function factorial(n) {
+  let value = 1;
+  for (let i = 2; i <= n; i += 1) value *= i;
+  return value;
+}
+
+function exactPlanCount(n) {
+  return factorial(n) * Math.pow(4, n);
+}
+
+function countForDir(dir, c = counts()) {
+  return c[dir] || 0;
+}
+
+function unitToleranceRange(dir) {
+  const nominal = num(`nom${dir}`);
+  return {
+    nominal,
+    min: nominal + num(`lower${dir}`),
+    max: nominal + num(`upper${dir}`)
+  };
+}
+
+function productToleranceRange(dir, c = counts()) {
+  const nominal = num(`nom${dir}`) * countForDir(dir, c);
+  return {
+    nominal,
+    min: nominal + num(`prodLower${dir}`),
+    max: nominal + num(`prodUpper${dir}`)
+  };
+}
+
+function updateProductRanges() {
+  const c = counts();
+  ["L", "W", "H"].forEach((dir) => {
+    const nominalNode = $(`finalNom${dir}`);
+    const rangeNode = $(`finalRange${dir}`);
+    if (!nominalNode || !rangeNode) return;
+    if (!hasValidCounts(c) || !Number.isFinite(num(`nom${dir}`))) {
+      nominalNode.textContent = "-";
+      rangeNode.textContent = "-";
+      return;
+    }
+    const range = productToleranceRange(dir, c);
+    nominalNode.textContent = range.nominal.toFixed(3);
+    rangeNode.textContent = `${range.min.toFixed(3)} ~ ${range.max.toFixed(3)}`;
+  });
+}
+
+function ensureRows() {
+  const c = counts();
+  if (!hasValidCounts(c)) {
+    while (tbody.rows.length) tbody.deleteRow(tbody.rows.length - 1);
+    $("dataStatus").textContent = "请先填写 L/W/H 数量";
+    return;
+  }
+  const total = totalParts(c);
+  while (tbody.rows.length < total) tbody.appendChild(makeRow(tbody.rows.length + 1));
+  while (tbody.rows.length > total) tbody.deleteRow(tbody.rows.length - 1);
+  $("dataStatus").textContent = `需要 ${total} 块工件`;
+}
+
+function makeRow(index) {
+  const tr = document.createElement("tr");
+  tr.appendChild(cellInput("", "text"));
+  fields.forEach(() => tr.appendChild(cellInput("", "number")));
+  return tr;
+}
+
+function cellInput(value, type) {
+  const td = document.createElement("td");
+  const input = document.createElement("input");
+  input.type = type;
+  input.step = "0.001";
+  input.value = value;
+  td.appendChild(input);
+  return td;
+}
+
+function shouldFormatThreeDecimals(input) {
+  return input?.type === "number" && !["countL", "countW", "countH"].includes(input.id);
+}
+
+function formatThreeDecimals(input) {
+  if (!shouldFormatThreeDecimals(input) || input.value.trim() === "") return;
+  const value = Number(input.value);
+  if (Number.isFinite(value)) input.value = value.toFixed(3);
+}
+
+function formatAllDecimalInputs() {
+  document.querySelectorAll('input[type="number"]').forEach(formatThreeDecimals);
+}
+
+function fillDemoData() {
+  ensureRows();
+  const c = counts();
+  if (!hasValidCounts(c)) {
+    showEmpty("请先填写 L/W/H 数量，再生成示例数据。");
+    return;
+  }
+  const baseL = num("nomL");
+  const baseW = num("nomW");
+  const baseH = num("nomH");
+  [...tbody.rows].forEach((row, i) => {
+    row.cells[0].querySelector("input").value = `M${i + 1}`;
+    fields.forEach((field, idx) => {
+      if (field.startsWith("S-")) {
+        const drift = Math.sin((i + 1) * (idx + 2)) * 0.012;
+        row.cells[idx + 1].querySelector("input").value = drift.toFixed(3);
+        return;
+      }
+      const axis = field[0];
+      const base = axis === "L" ? baseL : axis === "W" ? baseW : baseH;
+      const drift = (Math.sin((i + 1) * (idx + 2)) + Math.cos((i + 3) * (idx + 1))) * 0.015;
+      row.cells[idx + 1].querySelector("input").value = (base + drift).toFixed(3);
+    });
+  });
+  $("dataStatus").textContent = "已生成示例数据";
+}
+
+async function importExcelFile(file) {
+  try {
+    const rows = await readSimpleXlsx(file);
+    if (!rows.length) throw new Error("没有读取到数据行");
+    if (rows.length === 40) {
+      $("countL").value = 5;
+      $("countW").value = 4;
+      $("countH").value = 2;
+    }
+    ensureRows();
+    rows.slice(0, tbody.rows.length).forEach((data, rowIndex) => {
+      const row = tbody.rows[rowIndex];
+      row.cells[0].querySelector("input").value = data["编号"] || `M${rowIndex + 1}`;
+      fields.forEach((field, fieldIndex) => {
+        row.cells[fieldIndex + 1].querySelector("input").value = data[field] ?? "";
+      });
+    });
+    $("dataStatus").textContent = `已导入 ${Math.min(rows.length, tbody.rows.length)} 块工件`;
+    showEmpty("Excel 数据已导入。你仍然可以在表格中手动修改，然后点击计算。");
+  } catch (error) {
+    showEmpty(`导入失败：${error.message}`);
+    $("dataStatus").textContent = "导入失败";
+  } finally {
+    formatAllDecimalInputs();
+    $("importFile").value = "";
+  }
+}
+
+async function readSimpleXlsx(file) {
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  const zip = readZipEntries(bytes);
+  const workbookXml = await unzipText(zip, "xl/workbook.xml");
+  const workbookRels = await unzipText(zip, "xl/_rels/workbook.xml.rels");
+  const sharedStrings = zip.has("xl/sharedStrings.xml")
+    ? parseSharedStrings(await unzipText(zip, "xl/sharedStrings.xml"))
+    : [];
+  const sheetPath = findSheetPath(workbookXml, workbookRels, "导入数据");
+  const sheetXml = await unzipText(zip, sheetPath);
+  return parseSheetRows(sheetXml, sharedStrings);
+}
+
+function readZipEntries(bytes) {
+  const view = new DataView(bytes.buffer);
+  let eocd = -1;
+  for (let i = bytes.length - 22; i >= Math.max(0, bytes.length - 66000); i -= 1) {
+    if (view.getUint32(i, true) === 0x06054b50) {
+      eocd = i;
+      break;
+    }
+  }
+  if (eocd < 0) throw new Error("不是有效的 xlsx 文件");
+  const entryCount = view.getUint16(eocd + 10, true);
+  const centralOffset = view.getUint32(eocd + 16, true);
+  const entries = new Map();
+  let offset = centralOffset;
+  const decoder = new TextDecoder();
+  for (let i = 0; i < entryCount; i += 1) {
+    if (view.getUint32(offset, true) !== 0x02014b50) throw new Error("xlsx 压缩目录损坏");
+    const method = view.getUint16(offset + 10, true);
+    const compressedSize = view.getUint32(offset + 20, true);
+    const nameLength = view.getUint16(offset + 28, true);
+    const extraLength = view.getUint16(offset + 30, true);
+    const commentLength = view.getUint16(offset + 32, true);
+    const localOffset = view.getUint32(offset + 42, true);
+    const name = decoder.decode(bytes.slice(offset + 46, offset + 46 + nameLength));
+    entries.set(name, { method, compressedSize, localOffset, bytes });
+    offset += 46 + nameLength + extraLength + commentLength;
+  }
+  return entries;
+}
+
+async function unzipText(entries, name) {
+  const entry = entries.get(name);
+  if (!entry) throw new Error(`缺少 ${name}`);
+  const view = new DataView(entry.bytes.buffer);
+  const local = entry.localOffset;
+  if (view.getUint32(local, true) !== 0x04034b50) throw new Error(`无法读取 ${name}`);
+  const nameLength = view.getUint16(local + 26, true);
+  const extraLength = view.getUint16(local + 28, true);
+  const start = local + 30 + nameLength + extraLength;
+  const compressed = entry.bytes.slice(start, start + entry.compressedSize);
+  let output;
+  if (entry.method === 0) {
+    output = compressed;
+  } else if (entry.method === 8 && "DecompressionStream" in window) {
+    const stream = new Blob([compressed]).stream().pipeThrough(new DecompressionStream("deflate-raw"));
+    output = new Uint8Array(await new Response(stream).arrayBuffer());
+  } else {
+    throw new Error("当前浏览器不支持解压 xlsx，请换用新版 Chrome 或 Edge");
+  }
+  return new TextDecoder("utf-8").decode(output);
+}
+
+function parseXml(text) {
+  return new DOMParser().parseFromString(text, "application/xml");
+}
+
+function findSheetPath(workbookXml, relsXml, preferredName) {
+  const workbook = parseXml(workbookXml);
+  const rels = parseXml(relsXml);
+  const sheets = [...workbook.getElementsByTagName("sheet")];
+  const sheet = sheets.find((item) => item.getAttribute("name") === preferredName) || sheets[0];
+  if (!sheet) throw new Error("工作簿中没有 Sheet");
+  const relId = sheet.getAttribute("r:id") || sheet.getAttribute("id");
+  const rel = [...rels.getElementsByTagName("Relationship")].find((item) => item.getAttribute("Id") === relId);
+  if (!rel) throw new Error("无法定位导入数据 Sheet");
+  const target = rel.getAttribute("Target").replace(/^\/?xl\//, "");
+  return `xl/${target}`;
+}
+
+function parseSharedStrings(xml) {
+  const doc = parseXml(xml);
+  return [...doc.getElementsByTagName("si")].map((si) => [...si.getElementsByTagName("t")].map((t) => t.textContent).join(""));
+}
+
+function parseSheetRows(xml, sharedStrings) {
+  const doc = parseXml(xml);
+  const rawRows = [...doc.getElementsByTagName("row")].map((row) => {
+    const values = [];
+    [...row.getElementsByTagName("c")].forEach((cell) => {
+      const ref = cell.getAttribute("r") || "";
+      const col = columnIndex(ref.replace(/[0-9]/g, ""));
+      values[col] = cellValue(cell, sharedStrings);
+    });
+    return values;
+  });
+  const headerIndex = rawRows.findIndex((row) => row.includes("编号"));
+  if (headerIndex < 0) throw new Error("没有找到“编号”表头");
+  const headers = rawRows[headerIndex].map((value) => String(value || "").trim());
+  const missing = ["编号", ...fields].filter((field) => !headers.includes(field));
+  if (missing.length) throw new Error(`缺少列：${missing.join("、")}`);
+  return rawRows.slice(headerIndex + 1)
+    .filter((row) => row.some((value) => value !== undefined && value !== ""))
+    .map((row) => Object.fromEntries(headers.map((header, index) => [header, row[index] ?? ""])));
+}
+
+function columnIndex(label) {
+  let value = 0;
+  for (const char of label) value = value * 26 + char.charCodeAt(0) - 64;
+  return value - 1;
+}
+
+function cellValue(cell, sharedStrings) {
+  const type = cell.getAttribute("t");
+  if (type === "inlineStr") return cell.getElementsByTagName("t")[0]?.textContent || "";
+  const value = cell.getElementsByTagName("v")[0]?.textContent || "";
+  if (type === "s") return sharedStrings[Number(value)] || "";
+  if (value === "") return "";
+  const numeric = Number(value);
+  return Number.isFinite(numeric) ? numeric : value;
+}
+
+function renderMeasureGuide() {
+  const code = selectedMeasureField;
+  const guide = measureGuides[code];
+  $("guideCurrent").textContent = code;
+  $("guideCode").textContent = code;
+  $("guideTitle").textContent = guide.title;
+  $("guideDescription").textContent = guide.description;
+  $("guideRule").textContent = guide.rule;
+
+  const layer = $("measureLayer");
+  layer.innerHTML = "";
+
+  if (guide.line) {
+    const [[x1, y1], [x2, y2]] = guide.line;
+    layer.insertAdjacentHTML("beforeend", `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="measure-line"></line>`);
+    layer.insertAdjacentHTML("beforeend", `<line x1="${x1}" y1="${y1 - 18}" x2="${x2}" y2="${y2 - 18}" class="measure-arrow"></line>`);
+    return;
+  }
+
+  const facePoints = {
+    "2": "110,110 190,160 190,300 110,250",
+    "4": "330,110 410,160 410,300 330,250",
+    "3": "190,160 410,160 410,300 190,300",
+    "5": "110,110 330,110 330,250 110,250"
+  };
+  layer.insertAdjacentHTML("beforeend", `<polygon points="${facePoints[guide.face]}" class="measure-face"></polygon>`);
+  layer.insertAdjacentHTML("beforeend", `<line x1="${guide.probe.x}" y1="${guide.probe.y1}" x2="${guide.probe.x}" y2="${guide.probe.y2}" class="measure-arrow"></line>`);
+  layer.insertAdjacentHTML("beforeend", probeSvg(guide));
+}
+
+function probeSvg(guide) {
+  const { x, y1 } = guide.probe;
+  const vectors = {
+    "2": { nx: -1, ny: -0.18, tx: 1, ty: 0.18, depthX: -10, depthY: -7, label: "从左向右顶住2面" },
+    "4": { nx: 1, ny: 0.18, tx: -1, ty: -0.18, depthX: 12, depthY: -8, label: "从右向左顶住4面" },
+    "3": { nx: 0.34, ny: 1, tx: -0.34, ty: -1, depthX: 11, depthY: 8, label: "从前向后顶住3面" },
+    "5": { nx: -0.34, ny: -1, tx: 0.34, ty: 1, depthX: -12, depthY: -9, label: "从后向前顶住5面" }
+  };
+  const v = vectors[guide.face];
+  const body = { x: x + v.nx * 50, y: y1 + v.ny * 50 };
+  const dial = { x: x + v.nx * 76, y: y1 + v.ny * 76 };
+  const stemStart = { x: body.x + v.tx * 18, y: body.y + v.ty * 18 };
+  const stemEnd = { x: x + v.nx * 5, y: y1 + v.ny * 5 };
+  const rearBody = { x: body.x + v.depthX, y: body.y + v.depthY };
+  const rearDial = { x: dial.x + v.depthX * 0.75, y: dial.y + v.depthY * 0.75 };
+  const label = `<text x="${dial.x.toFixed(1)}" y="${(dial.y - 24).toFixed(1)}" class="probe-direction-label">${v.label}</text>`;
+  return `<g class="probe-assembly" aria-label="${v.label}">
+    <ellipse cx="${body.x + v.depthX * 0.45}" cy="${body.y + 22 + v.depthY * 0.25}" rx="28" ry="7" class="probe-shadow"></ellipse>
+    <line x1="${rearBody.x.toFixed(1)}" y1="${rearBody.y.toFixed(1)}" x2="${rearDial.x.toFixed(1)}" y2="${rearDial.y.toFixed(1)}" class="probe-back-post"></line>
+    <line x1="${stemStart.x.toFixed(1)}" y1="${stemStart.y.toFixed(1)}" x2="${stemEnd.x.toFixed(1)}" y2="${stemEnd.y.toFixed(1)}" class="probe-stem"></line>
+    <circle cx="${x}" cy="${y1}" r="5" class="probe-contact"></circle>
+    <rect x="${rearBody.x - 19}" y="${rearBody.y - 13}" width="38" height="28" rx="10" class="probe-cartoon-body-back"></rect>
+    <rect x="${body.x - 19}" y="${body.y - 13}" width="38" height="28" rx="10" class="probe-cartoon-body"></rect>
+    <rect x="${body.x - 10}" y="${body.y - 22}" width="20" height="12" rx="5" class="probe-neck"></rect>
+    <circle cx="${rearDial.x}" cy="${rearDial.y}" r="17" class="probe-dial-back"></circle>
+    <circle cx="${dial.x}" cy="${dial.y}" r="17" class="probe-dial"></circle>
+    <circle cx="${dial.x}" cy="${dial.y}" r="12" class="probe-dial-face"></circle>
+    <path d="M ${dial.x - 8} ${dial.y - 3} Q ${dial.x} ${dial.y - 9} ${dial.x + 8} ${dial.y - 3}" class="probe-scale"></path>
+    <circle cx="${dial.x}" cy="${dial.y}" r="2.6" class="probe-hub"></circle>
+    <line x1="${dial.x}" y1="${dial.y}" x2="${(dial.x + v.tx * 8).toFixed(1)}" y2="${(dial.y + v.ty * 8).toFixed(1)}" class="probe-needle"></line>
+    <circle cx="${body.x - 8}" cy="${body.y - 1}" r="2" class="probe-button"></circle>
+    <circle cx="${body.x + 8}" cy="${body.y - 1}" r="2" class="probe-button"></circle>
+    ${label}
+  </g>`;
+}
+
+function setupGuideButtons() {
+  renderGuideButtonGroup("dimensionGuideButtons", dimensionGuideKeys);
+  renderGuideButtonGroup("sideGuideButtons", sideGuideKeys);
+}
+
+function renderGuideButtonGroup(containerId, keys) {
+  const container = $(containerId);
+  container.innerHTML = keys.map((key) => `<button class="guide-button" type="button" data-measure="${key}">${guideButtonLabels[key]}</button>`).join("");
+  container.querySelectorAll("button").forEach((button) => {
+    button.addEventListener("click", () => {
+      selectedMeasureField = button.dataset.measure;
+      renderMeasureGuide();
+      updateGuideButtonState();
+    });
+  });
+}
+
+function updateGuideButtonState() {
+  document.querySelectorAll(".guide-button").forEach((button) => {
+    button.classList.toggle("active", button.dataset.measure === selectedMeasureField);
+  });
+}
+
+function readParts() {
+  return [...tbody.rows].map((row, i) => {
+    const id = row.cells[0].querySelector("input").value.trim();
+    const data = {};
+    fields.forEach((field, idx) => {
+      data[field] = Number(row.cells[idx + 1].querySelector("input").value || 0);
+    });
+    return { id, data };
+  });
+}
+
+function toleranceAxis(field) {
+  return field[0];
+}
+
+function findOutOfToleranceParts(parts) {
+  const issues = [];
+  parts.forEach((part) => {
+    dimensionFields.forEach((field) => {
+      const axis = toleranceAxis(field);
+      const range = unitToleranceRange(axis);
+      const value = part.data[field];
+      if (!Number.isFinite(value)) return;
+      if (value < range.min || value > range.max) {
+        issues.push({
+          part: part.id,
+          field,
+          value,
+          min: range.min,
+          max: range.max
+        });
+      }
+    });
+  });
+  return issues;
+}
+
+function hasCompleteToleranceInputs() {
+  return ["L", "W", "H"].every((dir) =>
+    ["nom", "upper", "lower"].every((prefix) => {
+      const value = $(`${prefix}${dir}`).value;
+      return value !== "" && Number.isFinite(Number(value));
+    }) &&
+    ["prodUpper", "prodLower"].every((prefix) => {
+      const input = $(`${prefix}${dir}`);
+      const value = input?.value ?? "";
+      return value !== "" && Number.isFinite(Number(value));
+    })
+  );
+}
+
+function clearValidationError() {
+  document.querySelectorAll(".validation-error").forEach((element) => element.classList.remove("validation-error"));
+}
+
+function markFirstInvalid(element) {
+  if (!element) return false;
+  clearValidationError();
+  element.classList.add("validation-error");
+  element.focus({ preventScroll: true });
+  element.scrollIntoView({ behavior: "smooth", block: "center" });
+  return true;
+}
+
+function isBlankOrInvalid(input) {
+  return input.value.trim() === "" || !Number.isFinite(Number(input.value));
+}
+
+function validateTopInputs() {
+  for (const id of ["countL", "countW", "countH"]) {
+    const input = $(id);
+    const value = Number(input.value);
+    if (input.value.trim() === "" || !Number.isInteger(value) || value <= 0) return markFirstInvalid(input);
+  }
+  for (const dir of ["L", "W", "H"]) {
+    for (const prefix of ["nom", "upper", "lower"]) {
+      const input = $(`${prefix}${dir}`);
+      if (isBlankOrInvalid(input)) return markFirstInvalid(input);
+    }
+    for (const prefix of ["prodUpper", "prodLower"]) {
+      const input = $(`${prefix}${dir}`);
+      if (isBlankOrInvalid(input)) return markFirstInvalid(input);
+    }
+  }
+  for (const id of ["focusDir", "computeMode"]) {
+    const input = $(id);
+    if (!input.value) return markFirstInvalid(input);
+  }
+  return false;
+}
+
+function validatePartInputs() {
+  for (const row of [...tbody.rows]) {
+    const idInput = row.cells[0].querySelector("input");
+    if (idInput.value.trim() === "") return markFirstInvalid(idInput);
+    for (let idx = 0; idx < dimensionFields.length; idx += 1) {
+      const input = row.cells[idx + 1].querySelector("input");
+      const value = Number(input.value);
+      if (input.value.trim() === "" || !Number.isFinite(value) || value === 0) return markFirstInvalid(input);
+    }
+    for (let idx = 0; idx < sideFields.length; idx += 1) {
+      const input = row.cells[dimensionFields.length + idx + 1].querySelector("input");
+      if (isBlankOrInvalid(input)) return markFirstInvalid(input);
+    }
+  }
+  return false;
+}
+
+function mapSide(side, orient) {
+  const horizontal = orient === "rotate" || orient === "flipRotate";
+  const vertical = orient === "flip" || orient === "flipRotate";
+  if (horizontal) {
+    if (side === "L") return "R";
+    if (side === "R") return "L";
+    if (side === "F") return "B";
+    if (side === "B") return "F";
+  }
+  if (vertical) {
+    if (side === "D") return "U";
+    if (side === "U") return "D";
+  }
+  return side;
+}
+
+function oriented(part, orient) {
+  const d = part.data;
+  const h = Object.fromEntries(corners.map((key) => {
+    const mapped = `${mapSide(key[0], orient)}${mapSide(key[1], orient)}`;
+    return [key, d[`H-${mapped}`]];
+  }));
+  const l = Object.fromEntries(lKeys.map((key) => {
+    const mapped = `${mapSide(key[0], orient)}${mapSide(key[1], orient)}`;
+    return [key, d[`L-${mapped}`]];
+  }));
+  const w = Object.fromEntries(wKeys.map((key) => {
+    const mapped = `${mapSide(key[0], orient)}${mapSide(key[1], orient)}`;
+    return [key, d[`W-${mapped}`]];
+  }));
+  const side = Object.fromEntries(sideFields.map((field) => {
+    const mapped = mapSideField(field, orient);
+    return [field, normalizeSideReading(mapped, d[mapped] || 0, orient)];
+  }));
+  return { h, l, w, side };
+}
+
+function normalizeSideReading(field, value, orient) {
+  const [, face] = field.split("-");
+  const faceSign = { "2": 1, "4": -1, "3": 1, "5": -1 }[face] || 1;
+  const horizontal = orient === "rotate" || orient === "flipRotate";
+  const vertical = orient === "flip" || orient === "flipRotate";
+  const orientationSign = (horizontal ? -1 : 1) * (vertical ? -1 : 1);
+  return value * faceSign * orientationSign;
+}
+
+function mapFace(face, orient) {
+  const horizontal = orient === "rotate" || orient === "flipRotate";
+  if (!horizontal) return face;
+  return { "2": "4", "4": "2", "3": "5", "5": "3" }[face];
+}
+
+function mapSideField(field, orient) {
+  const [, face, edge] = field.split("-");
+  const mappedFace = mapFace(face, orient);
+  let mappedEdge = edge;
+  if (orient === "rotate" || orient === "flipRotate") {
+    mappedEdge = { F: "B", B: "F", L: "R", R: "L" }[edge] || edge;
+  }
+  return `S-${mappedFace}-${mappedEdge}-H`;
+}
+
+function indexOf(l, w, h, c) {
+  return (h - 1) * c.L * c.W + (w - 1) * c.L + (l - 1);
+}
+
+function positiveGap(...values) {
+  return Math.max(0, ...values.map((value) => Number.isFinite(value) ? value : 0));
+}
+
+function contactGapL(leftItem, rightItem) {
+  const leftSide = leftItem.values.side;
+  const rightSide = rightItem.values.side;
+  return positiveGap(
+    (leftSide["S-4-F-H"] || 0) - (rightSide["S-2-F-H"] || 0),
+    (leftSide["S-4-B-H"] || 0) - (rightSide["S-2-B-H"] || 0)
+  );
+}
+
+function contactGapW(frontItem, backItem) {
+  const frontSide = frontItem.values.side;
+  const backSide = backItem.values.side;
+  return positiveGap(
+    (frontSide["S-5-L-H"] || 0) - (backSide["S-3-L-H"] || 0),
+    (frontSide["S-5-R-H"] || 0) - (backSide["S-3-R-H"] || 0)
+  );
+}
+
+function topSupportHeight(item) {
+  return Math.max(...corners.map((corner) => item.values.h[corner] || 0));
+}
+
+function evaluate(candidate, c, config) {
+  const placed = candidate.map((item) => ({ ...item, values: oriented(item.part, item.orient) }));
+  const lPaths = [];
+  const wPaths = [];
+  const hPoints = [];
+
+  for (let w = 1; w <= c.W; w += 1) {
+    for (let h = 1; h <= c.H; h += 1) {
+      lKeys.forEach((key) => {
+        let value = 0;
+        const members = [];
+        for (let l = 1; l <= c.L; l += 1) {
+          const item = placed[indexOf(l, w, h, c)];
+          value += item.values.l[key];
+          if (l > 1) {
+            const previous = placed[indexOf(l - 1, w, h, c)];
+            value += contactGapL(previous, item);
+          }
+          members.push(`${item.part.id}@P(${l},${w},${h})`);
+        }
+        lPaths.push({ value, label: `W=${w}, H=${h}, ${keyLabel(key)}`, members });
+      });
+    }
+  }
+
+  for (let l = 1; l <= c.L; l += 1) {
+    for (let h = 1; h <= c.H; h += 1) {
+      wKeys.forEach((key) => {
+        let value = 0;
+        const members = [];
+        for (let w = 1; w <= c.W; w += 1) {
+          const item = placed[indexOf(l, w, h, c)];
+          value += item.values.w[key];
+          if (w > 1) {
+            const previous = placed[indexOf(l, w - 1, h, c)];
+            value += contactGapW(previous, item);
+          }
+          members.push(`${item.part.id}@P(${l},${w},${h})`);
+        }
+        wPaths.push({ value, label: `L=${l}, H=${h}, ${keyLabel(key)}`, members });
+      });
+    }
+  }
+
+  for (let l = 1; l <= c.L; l += 1) {
+    for (let w = 1; w <= c.W; w += 1) {
+      corners.forEach((corner) => {
+        let value = 0;
+        const members = [];
+        for (let h = 1; h <= c.H; h += 1) {
+          const item = placed[indexOf(l, w, h, c)];
+          if (h < c.H) {
+            value += topSupportHeight(item);
+          } else {
+            value += item.values.h[corner];
+          }
+          members.push(`${item.part.id}@P(${l},${w},${h})`);
+        }
+        hPoints.push({ value, label: `L=${l}, W=${w}, ${cornerLabel(corner)}`, members });
+      });
+    }
+  }
+
+  const metrics = {
+    L: summarize(lPaths, "L", config, c),
+    W: summarize(wPaths, "W", config, c),
+    H: summarize(hPoints, "H", config, c)
+  };
+  const skew = summarizeSideSkew(placed);
+  const totalViolation = ["L", "W", "H"].reduce((sum, dir) => sum + metrics[dir].violation, 0);
+  const focusMetric = metrics[config.focus];
+  const otherFlatness = ["L", "W", "H"]
+    .filter((dir) => dir !== config.focus)
+    .reduce((sum, dir) => sum + metrics[dir].range, 0);
+  const smallness = ["L", "W", "H"].reduce((sum, dir) => sum + metrics[dir].smallness, 0);
+  const total = totalViolation * 1e9 + focusMetric.range * 1e6 + focusMetric.smallness * 1000 + otherFlatness * 100 + smallness + skew.score;
+  const focus = totalViolation * 1e9 + focusMetric.range * 1e6 + focusMetric.smallness;
+  return { placed, metrics, skew, total, focus };
+}
+
+function summarizeSideSkew(placed) {
+  const sum = placed.reduce((acc, item) => {
+    const s = item.values.side;
+    acc.leftRight += Math.abs((s["S-2-F-H"] || 0) - (s["S-4-F-H"] || 0));
+    acc.leftRight += Math.abs((s["S-2-B-H"] || 0) - (s["S-4-B-H"] || 0));
+    acc.frontBack += Math.abs((s["S-3-L-H"] || 0) - (s["S-5-L-H"] || 0));
+    acc.frontBack += Math.abs((s["S-3-R-H"] || 0) - (s["S-5-R-H"] || 0));
+    acc.twist += Math.abs((s["S-2-F-H"] || 0) - (s["S-2-B-H"] || 0));
+    acc.twist += Math.abs((s["S-4-F-H"] || 0) - (s["S-4-B-H"] || 0));
+    acc.twist += Math.abs((s["S-3-L-H"] || 0) - (s["S-3-R-H"] || 0));
+    acc.twist += Math.abs((s["S-5-L-H"] || 0) - (s["S-5-R-H"] || 0));
+    acc.total += sideFields.reduce((total, field) => total + Math.abs(s[field] || 0), 0);
+    return acc;
+  }, { leftRight: 0, frontBack: 0, twist: 0, total: 0 });
+  return {
+    leftRight: sum.leftRight,
+    frontBack: sum.frontBack,
+    twist: sum.twist,
+    total: sum.total,
+    score: (sum.leftRight + sum.frontBack + sum.twist * 0.5) * 12
+  };
+}
+
+function summarize(items, dir, config, c) {
+  const max = items.reduce((a, b) => (a.value >= b.value ? a : b));
+  const min = items.reduce((a, b) => (a.value <= b.value ? a : b));
+  const range = max.value - min.value;
+  const limit = productToleranceRange(dir, c);
+  const violation = items.reduce((sum, item) => {
+    if (item.value < limit.min) return sum + (limit.min - item.value);
+    if (item.value > limit.max) return sum + (item.value - limit.max);
+    return sum;
+  }, 0);
+  const smallness = items.reduce((sum, item) => sum + Math.max(0, item.value - limit.min), 0) / items.length;
+  return { max, min, range, limit, violation, smallness, score: violation * 1e9 + range * 1000 + smallness };
+}
+
+function keyLabel(key) {
+  return key
+    .replace("F", "前")
+    .replace("B", "后")
+    .replace("L", "左")
+    .replace("R", "右")
+    .replace("D", "下")
+    .replace("U", "上");
+}
+
+function cornerLabel(key) {
+  return key
+    .replace("L", "左")
+    .replace("R", "右")
+    .replace("F", "前角")
+    .replace("B", "后角");
+}
+
+async function exactSearch(parts, c, config) {
+  const used = new Array(parts.length).fill(false);
+  const candidate = new Array(parts.length);
+  let checked = 0;
+  let best = null;
+
+  async function visit(slot) {
+    if (stopRequested) return;
+    if (slot === parts.length) {
+      checked += 1;
+      const result = evaluate(candidate, c, config);
+      if (!best || result.total < best.total) best = result;
+      updateProgress(checked);
+      if (checked % deepChunkSize === 0) await new Promise((resolve) => setTimeout(resolve, 0));
+      return;
+    }
+    for (let i = 0; i < parts.length && !stopRequested; i += 1) {
+      if (used[i]) continue;
+      used[i] = true;
+      for (const orient of orientations) {
+        if (stopRequested) break;
+        candidate[slot] = { part: parts[i], orient };
+        await visit(slot + 1);
+      }
+      used[i] = false;
+    }
+  }
+
+  await visit(0);
+  return { best, checked, stoppedByUser: stopRequested };
+}
+
+function cloneCandidate(candidate) {
+  return candidate.map((item) => ({ part: item.part, orient: item.orient }));
+}
+
+function shuffledCandidate(parts, rand) {
+  const candidate = parts.map((part) => ({ part, orient: orientations[Math.floor(rand() * orientations.length)] }));
+  for (let i = candidate.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(rand() * (i + 1));
+    [candidate[i], candidate[j]] = [candidate[j], candidate[i]];
+  }
+  return candidate;
+}
+
+function averageAxis(part, axis) {
+  return fields
+    .filter((field) => field.startsWith(`${axis}-`))
+    .reduce((sum, field) => sum + part.data[field], 0) / 4;
+}
+
+function initialCandidates(parts, rand) {
+  const byH = [...parts].sort((a, b) => averageAxis(a, "H") - averageAxis(b, "H"));
+  const byVolume = [...parts].sort((a, b) => {
+    const av = averageAxis(a, "L") * averageAxis(a, "W") * averageAxis(a, "H");
+    const bv = averageAxis(b, "L") * averageAxis(b, "W") * averageAxis(b, "H");
+    return av - bv;
+  });
+  return [
+    parts.map((part) => ({ part, orient: "direct" })),
+    byH.map((part, index) => ({ part, orient: orientations[index % orientations.length] })),
+    byVolume.map((part, index) => ({ part, orient: orientations[(index + 1) % orientations.length] })),
+    shuffledCandidate(parts, rand),
+    shuffledCandidate(parts, rand)
+  ];
+}
+
+function mutate(candidate, rand) {
+  const next = cloneCandidate(candidate);
+  const mode = rand();
+  if (mode < 0.55) {
+    const a = Math.floor(rand() * next.length);
+    let b = Math.floor(rand() * next.length);
+    if (a === b) b = (b + 1) % next.length;
+    [next[a], next[b]] = [next[b], next[a]];
+  } else if (mode < 0.85) {
+    const a = Math.floor(rand() * next.length);
+    next[a] = { ...next[a], orient: orientations[Math.floor(rand() * orientations.length)] };
+  } else {
+    const a = Math.floor(rand() * next.length);
+    let b = Math.floor(rand() * next.length);
+    if (a === b) b = (b + 1) % next.length;
+    [next[a], next[b]] = [next[b], next[a]];
+    next[a] = { ...next[a], orient: orientations[Math.floor(rand() * orientations.length)] };
+    next[b] = { ...next[b], orient: orientations[Math.floor(rand() * orientations.length)] };
+  }
+  return next;
+}
+
+function readComputeOptions() {
+  return {
+    mode: $("computeMode").value,
+    timeMs: Number($("timeBudget").value),
+    count: Number($("countBudget").value)
+  };
+}
+
+async function deepOptimize(parts, c, config, options) {
+  const rand = Math.random;
+  let globalBest = null;
+  let checked = 0;
+  const started = performance.now();
+  const useTime = options.mode === "time";
+  const useCount = options.mode === "count";
+  const deadline = useTime ? started + options.timeMs : Number.POSITIVE_INFINITY;
+  const maxEvaluations = useCount ? options.count : Number.POSITIVE_INFINITY;
+
+  for (const start of initialCandidates(parts, rand)) {
+    let current = start;
+    let currentEval = evaluate(current, c, config);
+    checked += 1;
+    if (!globalBest || currentEval.total < globalBest.total) globalBest = currentEval;
+
+    while (!stopRequested && checked < maxEvaluations && performance.now() < deadline) {
+      const next = mutate(current, rand);
+      const nextEval = evaluate(next, c, config);
+      checked += 1;
+      const progress = useCount ? checked / maxEvaluations : Math.min(1, (performance.now() - started) / options.timeMs);
+      const temperature = Math.max(0.0001, 1 - progress);
+      const acceptWorse = rand() < Math.exp((currentEval.total - nextEval.total) / temperature);
+      if (nextEval.total < currentEval.total || acceptWorse) {
+        current = next;
+        currentEval = nextEval;
+      }
+      if (nextEval.total < globalBest.total) globalBest = nextEval;
+      if (checked % deepChunkSize === 0) {
+        const message = useTime
+          ? `随机优化中：${formatNumber(checked)} 次，预计完成还剩 ${formatRemainingTime(deadline - performance.now())}`
+          : `随机优化中：${formatNumber(checked)} / ${formatNumber(maxEvaluations)} 次`;
+        $("dataStatus").textContent = message;
+        updateProgress(checked);
+        await new Promise((resolve) => setTimeout(resolve, 0));
+      }
+    }
+    if (stopRequested || checked >= maxEvaluations || performance.now() >= deadline) break;
+  }
+
+  return {
+    best: globalBest,
+    checked,
+    stoppedByTime: performance.now() >= deadline,
+    stoppedByCount: checked >= maxEvaluations,
+    stoppedByUser: stopRequested
+  };
+}
+
+function startProgress({ mode, total, durationMs }) {
+  $("results").innerHTML = `<div class="progress-panel">
+    <div class="progress-top">
+      <span id="progressLabel">准备计算</span>
+      <div class="progress-actions">
+        <span id="progressPercent">0%</span>
+        <button id="stopCalculation" class="stop-button" type="button">停止</button>
+      </div>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  </div>`;
+  $("stopCalculation").addEventListener("click", requestStop);
+  activeProgress = {
+    mode,
+    total,
+    durationMs,
+    started: performance.now(),
+    lastUpdate: 0
+  };
+}
+
+function updateProgress(checked, force = false) {
+  if (!activeProgress) return;
+  const now = performance.now();
+  if (!force && now - activeProgress.lastUpdate < progressUpdateMs) return;
+  activeProgress.lastUpdate = now;
+
+  let ratio;
+  let label;
+  if (activeProgress.mode === "time") {
+    const elapsed = now - activeProgress.started;
+    ratio = Math.min(1, elapsed / activeProgress.durationMs);
+    label = `已评估 ${formatNumber(checked)} 次，预计完成还剩 ${formatRemainingTime(activeProgress.durationMs - elapsed)}`;
+  } else {
+    ratio = Math.min(1, checked / activeProgress.total);
+    const elapsed = Math.max(1, now - activeProgress.started);
+    const rate = checked / elapsed;
+    const remainingMs = rate > 0 ? (activeProgress.total - checked) / rate : 0;
+    label = `已评估 ${formatNumber(checked)} / ${formatNumber(activeProgress.total)} 次，预计完成还剩 ${formatRemainingTime(remainingMs)}`;
+  }
+
+  const percent = Math.round(ratio * 100);
+  $("progressFill").style.width = `${percent}%`;
+  $("progressPercent").textContent = `${percent}%`;
+  $("progressLabel").textContent = label;
+}
+
+function finishProgress(checked) {
+  updateProgress(checked, true);
+  activeProgress = null;
+}
+
+function setComputingState(active) {
+  isComputing = active;
+  $("calculate").disabled = active;
+  if (active) stopRequested = false;
+}
+
+function requestStop() {
+  if (!isComputing) return;
+  stopRequested = true;
+  const button = $("stopCalculation");
+  if (button) button.disabled = true;
+  $("dataStatus").textContent = "正在停止本次计算";
+}
+
+function remainingSeconds(deadline) {
+  return Math.max(0, Math.ceil((deadline - performance.now()) / 1000));
+}
+
+function formatRemainingTime(ms) {
+  const totalSeconds = Math.max(0, Math.ceil(ms / 1000));
+  if (totalSeconds >= 60) {
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${minutes}分钟${String(seconds).padStart(2, "0")}秒`;
+  }
+  return `${totalSeconds}秒`;
+}
+
+async function runSearch() {
+  if (isComputing) return;
+  clearValidationError();
+  ensureRows();
+  if (validateTopInputs()) {
+    showEmpty("请先补齐红框标出的内容。");
+    $("dataStatus").textContent = "有内容未填写";
+    return;
+  }
+  const parts = readParts();
+  const c = counts();
+  if (!hasValidCounts(c)) {
+    showEmpty("请先填写 L/W/H 数量。");
+    return;
+  }
+  if (!hasCompleteToleranceInputs()) {
+    showEmpty("请完整填写 L/W/H 的名义值、上偏差和下偏差。");
+    return;
+  }
+  const expected = totalParts(c);
+  const planCount = exactPlanCount(expected);
+
+  if (validatePartInputs()) {
+    showEmpty("请先补齐红框标出的工件数据。");
+    $("dataStatus").textContent = "有工件数据未填写";
+    return;
+  }
+
+  if (parts.length !== expected || parts.some((p) => !p.id || dimensionFields.some((f) => !Number.isFinite(p.data[f]) || p.data[f] === 0) || sideFields.some((f) => !Number.isFinite(p.data[f])))) {
+    showEmpty("请先补齐所有工件编号、12 项尺寸数据和 8 项侧面读数变化，或点击右上角的 ⌘ 生成示例数据。");
+    return;
+  }
+
+  const config = {
+    focus: $("focusDir").value
+  };
+  const toleranceIssues = findOutOfToleranceParts(parts);
+  if (!config.focus) {
+    showEmpty("请先选择重点方向，以及 L/W/H 三个方向的目标。");
+    return;
+  }
+  const options = readComputeOptions();
+  if (!options.mode) {
+    showEmpty("请先选择计算方式。");
+    $("dataStatus").textContent = "未选择计算方式";
+    return;
+  }
+  const exact = options.mode === "exact";
+
+  if (exact && planCount > exactLimit) {
+    showEmpty(`
+      当前完整枚举需要 ${formatNumber(planCount)} 种方案，超过浏览器安全上限 ${formatNumber(exactLimit)}。
+      请改用“按预计时间”或“按计算次数”的随机优化。
+    `);
+    $("dataStatus").textContent = "完整枚举规模过大";
+    return;
+  }
+
+  $("dataStatus").textContent = exact
+    ? `正在完整枚举 ${formatNumber(planCount)} 种方案`
+    : options.mode === "time"
+      ? `正在随机优化，预计 ${formatDuration(options.timeMs)}`
+      : `正在随机优化 ${formatNumber(options.count)} 次`;
+  startProgress(exact
+    ? { mode: "count", total: planCount }
+    : options.mode === "time"
+      ? { mode: "time", durationMs: options.timeMs }
+      : { mode: "count", total: options.count });
+  setComputingState(true);
+  await new Promise((resolve) => setTimeout(resolve, 40));
+
+  const started = performance.now();
+  try {
+    const searchResult = exact ? await exactSearch(parts, c, config) : await deepOptimize(parts, c, config, options);
+    const { best, checked } = searchResult;
+    if (searchResult.stoppedByUser) {
+      activeProgress = null;
+      $("dataStatus").textContent = "本次计算已停止";
+      showEmpty("本次计算已停止，未生成结果。你可以调整参数后重新计算。");
+      return;
+    }
+    const seconds = ((performance.now() - started) / 1000).toFixed(2);
+    $("dataStatus").textContent = exact
+      ? `已完整计算 ${formatNumber(checked)} 种方案`
+      : `已完成随机优化 ${formatNumber(checked)} 次评估`;
+    finishProgress(checked);
+    renderBestResult(best, config, c, checked, seconds, exact, searchResult, options, toleranceIssues);
+  } finally {
+    setComputingState(false);
+  }
+}
+
+function formatNumber(value) {
+  return Number(value).toLocaleString("zh-CN");
+}
+
+function formatDuration(ms) {
+  if (ms < 60000) return `${Math.round(ms / 1000)} 秒`;
+  return `${Math.round(ms / 60000)} 分钟`;
+}
+
+function renderBestResult(best, config, c, checked, seconds, exact, searchResult, options, toleranceIssues) {
+  $("results").innerHTML = solutionHtml(
+    exact ? "最佳方案：完整枚举后综合最优" : "最佳方案：随机优化后当前最优",
+    exact
+      ? `已检查 ${formatNumber(checked)} 种方案，用时 ${seconds} 秒。重点方向：${config.focus}。`
+      : `已真实评估 ${formatNumber(checked)} 个随机候选方案，用时 ${seconds} 秒。${
+        options.mode === "time"
+          ? `目标时间 ${formatDuration(options.timeMs)}，已按时间停止。`
+          : `目标次数 ${formatNumber(options.count)} 次，${searchResult.stoppedByCount ? "已达到次数预算。" : "提前停止。"}`
+      }重点方向：${config.focus}。`,
+    best,
+    c,
+    toleranceIssues
+  );
+}
+
+function solutionHtml(title, reason, result, c, toleranceIssues = []) {
+  return `<article class="solution">
+    <h2>${title}<span>${reason}</span></h2>
+    <div class="metrics">${["L", "W", "H"].map((dir) => metricHtml(dir, result.metrics[dir])).join("")}${skewHtml(result.skew)}</div>
+    ${toleranceIssuesHtml(toleranceIssues)}
+    ${placementModelListHtml(result, c)}
+  </article>`;
+}
+
+function toleranceIssuesHtml(issues) {
+  if (!issues.length) {
+    return `<div class="tolerance-report ok"><b>单件公差检查</b><p>所有工件尺寸测量项都在单件公差范围内。</p></div>`;
+  }
+  const rows = issues.map((issue) => `<tr>
+    <td>${issue.part}</td>
+    <td>${issue.field}</td>
+    <td>${issue.value.toFixed(3)}</td>
+    <td>${issue.min.toFixed(3)} ~ ${issue.max.toFixed(3)}</td>
+  </tr>`).join("");
+  return `<div class="tolerance-report warn">
+    <b>超出单件公差的测量项</b>
+    <p>以下工件仍会参与计算，但需要单独确认。</p>
+    <div class="tolerance-table-wrap">
+      <table class="tolerance-table">
+        <thead><tr><th>工件</th><th>测量项</th><th>实测值</th><th>允许范围</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+function placementAt(result, c, l, w, h) {
+  return result.placed[(h - 1) * c.L * c.W + (w - 1) * c.L + (l - 1)];
+}
+
+function layerName(h, totalH) {
+  if (h === 1) return "最下层";
+  if (h === totalH) return "最上层";
+  return "中间层";
+}
+
+function spatialLayoutHtml(result, c) {
+  const layers = [];
+  for (let h = c.H; h >= 1; h -= 1) {
+    const headerCells = Array.from({ length: c.L }, (_, index) => `<div class="spatial-axis">第${index + 1}列</div>`).join("");
+    const rows = [];
+    for (let w = 1; w <= c.W; w += 1) {
+      const side = w === 1 ? "前侧" : w === c.W ? "后侧" : `第${w}排`;
+      const cells = [];
+      for (let l = 1; l <= c.L; l += 1) {
+        const item = placementAt(result, c, l, w, h);
+        cells.push(`<div class="spatial-cell" title="${orientationText[item.orient]}">
+          <b>${item.part.id}</b>
+          <span>${orientationShortText[item.orient]}</span>
+        </div>`);
+      }
+      rows.push(`<div class="spatial-row-label">${side}</div>${cells.join("")}`);
+    }
+    layers.push(`<section class="spatial-layer">
+      <div class="spatial-layer-title">
+        <b>H方向第${h}层</b>
+        <span>${layerName(h, c.H)}，这一层从上往下看</span>
+      </div>
+      <div class="spatial-grid" style="grid-template-columns: 54px repeat(${c.L}, minmax(92px, 1fr));">
+        <div class="spatial-corner">W\\L</div>
+        ${headerCells}
+        ${rows.join("")}
+      </div>
+    </section>`);
+  }
+  return `<div class="spatial-layout">
+    <div class="spatial-note">空间读法：每一块小格就是一个工件位置。横向是 L 方向从左到右，纵向是 W 方向从前到后；层数按 H 方向从下到上堆叠。</div>
+    ${layers.join("")}
+  </div>`;
+}
+
+function placementPosition(index, c) {
+  const h = Math.floor(index / (c.L * c.W)) + 1;
+  const rest = index % (c.L * c.W);
+  const w = Math.floor(rest / c.L) + 1;
+  const l = (rest % c.L) + 1;
+  return { l, w, h };
+}
+
+function miniModelHtml(c, active) {
+  const dims = {
+    L: Math.max(1, num("nomL") * c.L),
+    W: Math.max(1, num("nomW") * c.W),
+    H: Math.max(1, num("nomH") * c.H)
+  };
+  const block = { L: dims.L / c.L, W: dims.W / c.W, H: dims.H / c.H };
+  const cos = 0.866;
+  const sin = 0.5;
+  const project = (x, y, z) => ({ x: (x - y) * cos, y: (x + y) * sin - z });
+  const cuboidFaces = (x, y, z, dx, dy, dz) => {
+    const p = {
+      a: project(x, y, z),
+      b: project(x + dx, y, z),
+      c: project(x + dx, y + dy, z),
+      d: project(x, y + dy, z),
+      e: project(x, y, z + dz),
+      f: project(x + dx, y, z + dz),
+      g: project(x + dx, y + dy, z + dz),
+      h: project(x, y + dy, z + dz)
+    };
+    return [
+      [p.e, p.f, p.g, p.h],
+      [p.a, p.b, p.f, p.e],
+      [p.b, p.c, p.g, p.f],
+      [p.c, p.d, p.h, p.g],
+      [p.d, p.a, p.e, p.h]
+    ];
+  };
+  const raw = [];
+  for (let h = 1; h <= c.H; h += 1) {
+    for (let w = c.W; w >= 1; w -= 1) {
+      for (let l = 1; l <= c.L; l += 1) {
+        const isActive = active.l === l && active.w === w && active.h === h;
+        raw.push({
+          isActive,
+          faces: cuboidFaces((l - 1) * block.L, (w - 1) * block.W, (h - 1) * block.H, block.L, block.W, block.H)
+        });
+      }
+    }
+  }
+  const axisOriginRaw = project(0, 0, 0);
+  const axisLModelRaw = project(dims.L, 0, 0);
+  const axisWModelRaw = project(0, dims.W, 0);
+  const axisHModelRaw = project(0, 0, dims.H);
+  const axisLRaw = project(dims.L * 1.48, 0, 0);
+  const axisWRaw = project(0, dims.W * 1.48, 0);
+  const axisHRaw = project(0, 0, dims.H * 1.52);
+  const points = raw.flatMap((cube) => cube.faces.flat()).concat([axisOriginRaw, axisLRaw, axisWRaw, axisHRaw]);
+  const minX = Math.min(...points.map((p) => p.x));
+  const maxX = Math.max(...points.map((p) => p.x));
+  const minY = Math.min(...points.map((p) => p.y));
+  const maxY = Math.max(...points.map((p) => p.y));
+  const width = maxX - minX || 1;
+  const height = maxY - minY || 1;
+  const pad = 22;
+  const viewW = 210;
+  const viewH = 150;
+  const scale = Math.min((viewW - pad * 2) / width, (viewH - pad * 2) / height);
+  const toSvg = (p) => ({ x: (p.x - minX) * scale + pad, y: (p.y - minY) * scale + pad });
+  const toPoint = (p) => {
+    const svg = toSvg(p);
+    return `${svg.x.toFixed(1)},${svg.y.toFixed(1)}`;
+  };
+  const faceHtml = raw.map((cube) => {
+    const fill = cube.isActive ? ["#ff453a", "#e63b31", "#c9342b", "#d93a31", "#ef5148"] : ["#f8f8fb", "#e8ebf0", "#d9dde5", "#d0d5df", "#e2e5eb"];
+    const opacity = cube.isActive ? 1 : 0.36;
+    return cube.faces.map((face, index) =>
+      `<polygon points="${face.map(toPoint).join(" ")}" fill="${fill[index]}" stroke="${cube.isActive ? "#b4231c" : "#b7bcc7"}" stroke-width="${cube.isActive ? 1.2 : 0.55}" opacity="${opacity}"></polygon>`
+    ).join("");
+  }).join("");
+  const axisOrigin = toSvg(axisOriginRaw);
+  const axisLModel = toSvg(axisLModelRaw);
+  const axisWModel = toSvg(axisWModelRaw);
+  const axisHModel = toSvg(axisHModelRaw);
+  const axisL = toSvg(axisLRaw);
+  const axisW = toSvg(axisWRaw);
+  const axisH = toSvg(axisHRaw);
+  const axisDefsHtml = `
+    <defs>
+      <marker id="axis-arrow-l" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+        <path d="M0,0 L7,3.5 L0,7 Z" fill="#007aff"></path>
+      </marker>
+      <marker id="axis-arrow-w" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+        <path d="M0,0 L7,3.5 L0,7 Z" fill="#34c759"></path>
+      </marker>
+      <marker id="axis-arrow-h" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+        <path d="M0,0 L7,3.5 L0,7 Z" fill="#af52de"></path>
+      </marker>
+    </defs>`;
+  const axisBackHtml = `
+    <g class="model-axis">
+      <line x1="${axisOrigin.x.toFixed(1)}" y1="${axisOrigin.y.toFixed(1)}" x2="${axisLModel.x.toFixed(1)}" y2="${axisLModel.y.toFixed(1)}" class="axis-l axis-back"></line>
+      <line x1="${axisOrigin.x.toFixed(1)}" y1="${axisOrigin.y.toFixed(1)}" x2="${axisWModel.x.toFixed(1)}" y2="${axisWModel.y.toFixed(1)}" class="axis-w axis-back"></line>
+      <line x1="${axisOrigin.x.toFixed(1)}" y1="${axisOrigin.y.toFixed(1)}" x2="${axisHModel.x.toFixed(1)}" y2="${axisHModel.y.toFixed(1)}" class="axis-h axis-back"></line>
+    </g>`;
+  const axisFrontHtml = `
+    <g class="model-axis">
+      <line x1="${axisLModel.x.toFixed(1)}" y1="${axisLModel.y.toFixed(1)}" x2="${axisL.x.toFixed(1)}" y2="${axisL.y.toFixed(1)}" class="axis-l axis-front" marker-end="url(#axis-arrow-l)"></line>
+      <line x1="${axisWModel.x.toFixed(1)}" y1="${axisWModel.y.toFixed(1)}" x2="${axisW.x.toFixed(1)}" y2="${axisW.y.toFixed(1)}" class="axis-w axis-front" marker-end="url(#axis-arrow-w)"></line>
+      <line x1="${axisHModel.x.toFixed(1)}" y1="${axisHModel.y.toFixed(1)}" x2="${axisH.x.toFixed(1)}" y2="${axisH.y.toFixed(1)}" class="axis-h axis-front" marker-end="url(#axis-arrow-h)"></line>
+    </g>`;
+  const axisLabelHtml = `
+    <g class="model-axis-labels">
+      <text x="${axisL.x.toFixed(1)}" y="${axisL.y.toFixed(1)}" dx="-8" dy="-4" text-anchor="end" class="axis-label axis-l-label">L${active.l}</text>
+      <text x="${axisW.x.toFixed(1)}" y="${axisW.y.toFixed(1)}" dx="8" dy="-4" text-anchor="start" class="axis-label axis-w-label">W${active.w}</text>
+      <text x="${axisH.x.toFixed(1)}" y="${axisH.y.toFixed(1)}" dx="6" dy="0" text-anchor="start" class="axis-label axis-h-label">H${active.h}</text>
+      <text x="10" y="18" class="axis-position-summary">P(${active.l},${active.w},${active.h})</text>
+    </g>`;
+  return `<svg class="mini-model-3d" viewBox="0 0 ${viewW} ${viewH}" role="img" aria-label="按真实长宽高比例绘制的完整立体模型，红色为当前工件位置">${axisDefsHtml}${axisBackHtml}${faceHtml}${axisFrontHtml}${axisLabelHtml}</svg>`;
+}
+
+function placementModelListHtml(result, c) {
+  const layers = [];
+  for (let h = 1; h <= c.H; h += 1) {
+    const cards = [];
+    for (let w = 1; w <= c.W; w += 1) {
+      for (let l = 1; l <= c.L; l += 1) {
+        const index = (h - 1) * c.L * c.W + (w - 1) * c.L + (l - 1);
+        const item = result.placed[index];
+        const position = { l, w, h };
+        cards.push(`<article class="model-card">
+          ${miniModelHtml(c, position)}
+          <div class="model-card-info">
+            <b>${item.part.id}</b>
+            <p>${orientationShortText[item.orient]}</p>
+          </div>
+        </article>`);
+      }
+    }
+    layers.push(`<section class="model-layer-section">
+      <h3>H方向第${h}层 <span>${layerName(h, c.H)}，本层按 L 从左往右排列</span></h3>
+      <div class="model-card-grid">${cards.join("")}</div>
+    </section>`);
+  }
+  return `<div class="model-results">
+    <div class="spatial-note">读法：结果按位置从下往上排列；每层内部按 L 从左到右排列，并保留 P(L,W,H) 的写法。每个模型上的 L/W/H 三坐标用于判断方向，红色块是当前工件位置。</div>
+    ${layers.join("")}
+  </div>`;
+}
+
+function skewHtml(skew) {
+  if (!skew) return "";
+  return `<div class="metric">
+    <b>侧歪趋势</b>
+    <p>左右侧面同向趋势：${skew.leftRight.toFixed(3)}</p>
+    <p>前后侧面同向趋势：${skew.frontBack.toFixed(3)}</p>
+    <p>同一面两侧差异：${skew.twist.toFixed(3)}</p>
+    <p>总读数变化量：${skew.total.toFixed(3)}</p>
+    <p>用于规避整体平行四边体趋势</p>
+  </div>`;
+}
+
+function metricHtml(dir, metric) {
+  const name = dir === "H" ? "H方向最高/最低" : dir === "L" ? "L方向最长/最短" : "W方向最宽/最窄";
+  const inRange = metric.violation <= 1e-9;
+  return `<div class="metric">
+    <b>${name}</b>
+    <p>最大：${metric.max.value.toFixed(3)}，${metric.max.label}</p>
+    <p>最小：${metric.min.value.toFixed(3)}，${metric.min.label}</p>
+    <p>差异：${metric.range.toFixed(3)}</p>
+    <p>成品允许范围：${metric.limit.min.toFixed(3)} ~ ${metric.limit.max.toFixed(3)}</p>
+    <p>范围状态：${inRange ? "在范围内" : `超出总量 ${metric.violation.toFixed(3)}`}</p>
+    <p>目标：在成品公差范围内尽量小</p>
+  </div>`;
+}
+function showEmpty(message) {
+  $("results").innerHTML = `<div class="empty">${message}</div>`;
+}
+
+function syncComputeModeOptions() {
+  const mode = $("computeMode").value;
+  const timeOption = $("timeBudget").closest("label");
+  const countOption = $("countBudget").closest("label");
+  timeOption.hidden = mode !== "time";
+  countOption.hidden = mode !== "count";
+  timeOption.style.display = mode === "time" ? "" : "none";
+  countOption.style.display = mode === "count" ? "" : "none";
+}
+
+["countL", "countW", "countH"].forEach((id) => {
+  $(id).addEventListener("change", () => {
+    ensureRows();
+    updateProductRanges();
+  });
+});
+["L", "W", "H"].forEach((dir) => {
+  ["nom", "upper", "lower", "prodUpper", "prodLower"].forEach((prefix) => {
+    const input = $(`${prefix}${dir}`);
+    if (input) input.addEventListener("input", updateProductRanges);
+  });
+});
+$("computeMode").addEventListener("change", syncComputeModeOptions);
+document.addEventListener("input", (event) => {
+  if (event.target.classList?.contains("validation-error")) event.target.classList.remove("validation-error");
+});
+document.addEventListener("change", (event) => {
+  if (event.target.classList?.contains("validation-error")) event.target.classList.remove("validation-error");
+  formatThreeDecimals(event.target);
+});
+document.addEventListener("blur", (event) => formatThreeDecimals(event.target), true);
+document.addEventListener("click", (event) => {
+  const pressable = event.target.closest?.("button, .button-link");
+  if (!pressable || pressable.disabled) return;
+  pressable.classList.remove("press-feedback");
+  void pressable.offsetWidth;
+  pressable.classList.add("press-feedback");
+  window.setTimeout(() => pressable.classList.remove("press-feedback"), 140);
+});
+$("syncRows").addEventListener("click", () => {
+  ensureRows();
+  updateProductRanges();
+});
+$("fillDemo").addEventListener("click", () => {
+  fillDemoData();
+  formatAllDecimalInputs();
+});
+$("calculate").addEventListener("click", runSearch);
+$("importExcel").addEventListener("click", () => $("importFile").click());
+$("importFile").addEventListener("change", (event) => {
+  const file = event.target.files?.[0];
+  if (file) importExcelFile(file);
+});
+
+document.querySelectorAll("#targetL, #targetW, #targetH").forEach((select) => {
+  const label = select.closest("label");
+  if (label) label.hidden = true;
+});
+const weightsPanel = document.querySelector(".weights");
+if (weightsPanel) weightsPanel.hidden = true;
+updateProductRanges();
+syncComputeModeOptions();
+ensureRows();
+formatAllDecimalInputs();
+setupGuideButtons();
+renderMeasureGuide();
+updateGuideButtonState();
+showEmpty("输入、导入或生成工件数据后，选择计算方式并点击计算。大数量建议使用按预计时间或按计算次数的随机优化。");
+
+</script>
+  </body>
+</html>
